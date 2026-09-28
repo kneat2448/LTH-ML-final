@@ -195,3 +195,4 @@ Reminders:
   - End of session: the user asked only for NOTES.md to be finalized. No further code changes.
     Session 2 starts at section 8, step 1.
   - Initialised git, first commit of the code, configs, notebook, notes and pilot (remote: kneat2448/LTH-ML-final).
+  - Added README.md and pushed `main` to GitHub.
