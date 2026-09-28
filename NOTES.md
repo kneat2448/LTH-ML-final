@@ -16,7 +16,15 @@ measured and what is still open. **Update it at the end of every work session.**
 - **CIFAR-10:** `data/cifar-10-python.tar.gz` is on Drive (uploaded from the laptop, MD5 c58f3010… verified).
   **Do not download it from cs.toronto.edu on Colab** (see O7). Copy it to local disk at session start:
   `mkdir -p /content/cifar_raw && cp data/cifar-10-python.tar.gz /content/cifar_raw/` and set `LTH_RAW_DATA=/content/cifar_raw`.
-- **Git:** local commits exist that are **not pushed** (the push needs a GitHub token; run it yourself, see O3).
+- **Git:** every session-2 commit after `2cfb0de` is **local only** (list them with `git log origin/main..main`):
+  pilot re-analysis, O1 schedule, smoke results and NOTES updates. The push needs a GitHub token; run it yourself (section 8, step 1). Commits are authored as
+  `Nitai <nitaikoundinye@gmail.com>` (set in the repo's local git config on Colab).
+- **Pilot re-analysis (session 2):** `pilot_results/PILOT_FINDINGS.md`. It changes how section 10 of the spec may be cited:
+  P1 reversed (dense eta = 0.1 collapses in 2 of 3 runs), P3 weakened (high-LR ticket deficit is seed-dependent),
+  P2 unverified (pilot lambda values look like the D1 power-iteration failure), and a new signal: an early loss spike > 8x
+  predicted every failure, all before step 200 (the reason for D11's early points).
+- **Forecast (T4, ~9 min per training):** Gate A after Phase A ≈ 9 GPU-h (≈ 2 days of Colab sessions);
+  full H1–H4 findings after Phase B ≈ 19 GPU-h total (≈ 1 week including analysis and write-up).
 - **Next:** Phase A in the order of section 7 (see section 8).
 
 ## 2. Quick start
@@ -24,15 +32,19 @@ measured and what is still open. **Update it at the end of every work session.**
 ### Local (Windows laptop)
 ```
 conda activate lth           # C:\Users\Nitai\anaconda3\envs\lth\python.exe
-python -m pytest             # 20 tests, ~40 s
+python -m pytest             # 21 tests, ~40 s
 python -m src.imp configs/smoke.yaml
 ```
 
-### Colab (preferred from now on)
-1. Upload the whole `final_project` folder to `MyDrive/final_project`
-   (or unzip `final_project_drive.zip` there; see section 3).
-2. Open `colab/run_on_colab.ipynb` in Colab and pick a GPU runtime (G4).
-3. Edit `LTH_BUDGET_H` in cell 2, then run cells 1–5 (mount, env, tests, smoke, benchmark summary).
+### Colab (preferred from now on; session 2 used a T4)
+1. `MyDrive/final_project` is a git clone of the repo (session 2) with `data/cifar-10-python.tar.gz` added.
+2. Open `colab/run_on_colab.ipynb` in Colab and pick a GPU runtime (T4 works: ~9 min per 15k training).
+3. **Before any cell that loads CIFAR-10**, copy the Drive archive to local disk; the notebook's own download
+   from cs.toronto.edu is blocked/slow on Colab (O7):
+   `!mkdir -p /content/cifar_raw && cp /content/drive/MyDrive/final_project/data/cifar-10-python.tar.gz /content/cifar_raw/`
+   (`LTH_RAW_DATA=/content/cifar_raw` is set in cell 2). torchvision then finds the file, checks the MD5 and skips the download.
+4. On a T4 no `LTH_BUDGET_H` is needed (30 h built in). Run cells 1–3 (mount, env, tests); cells 4–5 (smoke,
+   benchmark) are already done for the T4 (section 6).
 4. Phase A/B cells follow. **Run one training cell at a time.**
 5. If the session dies: re-run cells 1–2, then the same command. Finished trainings are skipped.
 
@@ -84,9 +96,13 @@ python -m analysis.plots                                              # summary.
 | `src/fixed_mask.py` | H4 fixed-mask runs + anchor lam selection |
 | `src/utils.py` | seeding, run metadata (git hash, versions, GPU), Tee, compute log, budgets (not in the spec's layout) |
 | `analysis/plots.py` | summary.csv, fig1–5, metrics_table.{md,csv}, ticket_advantage.csv, gate_a.md |
+| `analysis/pilot_summary.py` | session 2: re-analysis of all pilot JSONs → `pilot_results/{pilot_summary.csv, pilot_tables.md, fig_pilot_acc.png, fig_pilot_spike.png}` |
+| `pilot_results/PILOT_FINDINGS.md` | session 2: pilot findings F1–F7 vs spec section 10 (2 seeds of the 4-epoch design: CPU + GPU re-run) |
 | `configs/` | smoke, resnet20_{low,high,warm03,high_warm}, conv4_fmnist_high, h4_high, h4_high_sam, h4_high_anchor |
 | `colab/run_on_colab.ipynb` | Colab runner (mount, env, tests, smoke, benchmark summary, Phase A/B cells) |
-| `tests/` | 20 tests (section 12 list plus schedules, NaN-mask guard, negative-dominant spectrum) |
+| `tests/` | 21 tests (section 12 list plus schedules incl. the D11 schedule, NaN-mask guard, negative-dominant spectrum) |
+| `data/cifar-10-python.tar.gz` | official archive on Drive (not in git), uploaded from the laptop in session 2 |
+| `results/smoke/seed0/` | T4 smoke run with the D11 schedule (6 trainings); benchmark reference |
 | `results/_archive/smoke_laptop_20260928_old_lambda/` | first smoke run, before the Lanczos fix; timing reference only |
 
 ## 5. Decisions and deviations from the spec
@@ -170,12 +186,14 @@ python -m analysis.plots                                              # summary.
 
   All of these are config/code changes that the spec says need approval. After the decision, update
   `sharpness:` in every config (the smoke config too) and re-run the smoke benchmark.
-- **O3. Resolved (2026-09-28).** Git repo initialised, remote `origin` = https://github.com/kneat2448/LTH-ML-final.git
+- **O3. Resolved (2026-09-28); push pending since session 2.** Session-2 commits are local only (section 1).
+  A token pasted in chat in session 2 was not used (the push was blocked by the auto-mode permission check); **revoke it**.
+  Original entry: Git repo initialised, remote `origin` = https://github.com/kneat2448/LTH-ML-final.git
   (branch `main`). Not committed on purpose: `data/`, `checkpoints/`, `*.pt`, `pilot/data/` (Fashion-MNIST .gz;
   get it from the Drive zip or zalandoresearch/fashion-mnist), `research paper/` (third-party PDFs), `*.zip`.
   On Colab, `git clone` also works instead of the Drive zip, but then copy `pilot/data/*.gz` in by hand.
   Uploading `.git` with the Drive copy lets runs record the commit hash.
-- **O4. Budget for the G4.** Sections 4 and 9 only cover the RTX 4060 (18 h) and a T4 (30 h). Agree on a
+- **O4. Budget for the G4. Moot while on a T4** (the built-in 30 T4-h budget applies). Only needed if runs move to a G4. Sections 4 and 9 only cover the RTX 4060 (18 h) and a T4 (30 h). Agree on a
   G4 budget (compute units), set `LTH_BUDGET_H`, and note it in the spec's section 9.
 - **O5.** Laptop throttling (section 6). Irrelevant on Colab, but fix it before using the laptop again.
 - **O7. cs.toronto.edu blocks this Colab IP (session 2).** The single-connection download ran at ~55 kB/s. A
@@ -243,4 +261,8 @@ Reminders:
   - Smoke benchmark on the T4 (all 6 trainings done): 14 ms/step warm, 21.5 s per lambda_max, 2.46 GB peak
     → ~9 min per 15k training. Budget re-derived (section 6): Phase A+B ≈ 19 T4-h of the 30 h budget.
   - A GitHub push with a pasted token was blocked by the auto-mode permission check; commits are local only (step 1 of section 8).
+  - Gave the user a time forecast (section 1): ≈ 2 days to Gate A, ≈ 1 week to full findings on the T4.
+  - Set the repo-local git identity on Colab to `Nitai <nitaikoundinye@gmail.com>` (matches earlier commits).
+  - Proposals from the pilot re-analysis, not yet acted on: report a per-condition collapse rate in the main
+    summary; cite P1 as "collapses in 2 of 3 short runs"; drop P2 or re-measure it with Lanczos.
   - Next: Phase A (section 8, step 4).
