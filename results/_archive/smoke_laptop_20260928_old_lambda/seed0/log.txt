@@ -1,0 +1,12 @@
+COST ESTIMATE smoke: 6 trainings x 0.1 min = 0.01 GPU-h on NVIDIA GeForce RTX 4060 Laptop GPU; used so far 0.00 / 18 h
+[smoke seed0 r0 ticket] mode=plain remaining=1.0000
+   acc=0.4447 f1=0.4356 R02=0.771 maxS3k=0.151 diverged=False wall=3.8min sharp_overhead=859.6% peakVRAM=2450MB
+[smoke seed0 r1 ticket] mode=plain remaining=0.7008
+   acc=0.4880 f1=0.4827 R02=0.797 maxS3k=0.827 diverged=False wall=3.7min sharp_overhead=1866.6% peakVRAM=2450MB
+[smoke seed0 r1 reinit] mode=plain remaining=0.7008
+   acc=0.5174 f1=0.5120 R02=0.777 maxS3k=0.174 diverged=False wall=4.9min sharp_overhead=2903.9% peakVRAM=2450MB
+[smoke seed0 r2 ticket] mode=plain remaining=0.4914
+   acc=0.5635 f1=0.5604 R02=0.746 maxS3k=0.494 diverged=False wall=8.0min sharp_overhead=4080.4% peakVRAM=2450MB
+[smoke seed0 r2 reinit] mode=plain remaining=0.4914
+   acc=0.4995 f1=0.4924 R02=0.756 maxS3k=0.106 diverged=False wall=7.7min sharp_overhead=6986.5% peakVRAM=2450MB
+[smoke seed0 r2 shuffle] mode=plain remaining=0.4914

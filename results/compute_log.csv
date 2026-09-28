@@ -1,0 +1,6 @@
+time,condition,seed,round,variant,model,mode,gpu,iters,wall_s,sharpness_s,it_per_s,peak_vram_mb,diverged
+2026-09-28T13:40:36,smoke,0,0,ticket,resnet20,plain,NVIDIA GeForce RTX 4060 Laptop GPU,300,226.5,202.9,12.7,2450,False
+2026-09-28T13:44:21,smoke,0,1,ticket,resnet20,plain,NVIDIA GeForce RTX 4060 Laptop GPU,300,223.4,212.1,26.4,2450,False
+2026-09-28T13:49:16,smoke,0,1,reinit,resnet20,plain,NVIDIA GeForce RTX 4060 Laptop GPU,300,294.4,284.6,30.6,2450,False
+2026-09-28T13:57:16,smoke,0,2,ticket,resnet20,plain,NVIDIA GeForce RTX 4060 Laptop GPU,300,478.9,467.5,26.2,2450,False
+2026-09-28T14:05:02,smoke,0,2,reinit,resnet20,plain,NVIDIA GeForce RTX 4060 Laptop GPU,300,464.6,458.1,45.8,2450,False

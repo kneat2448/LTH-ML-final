@@ -1,0 +1,23 @@
+# Benchmark / smoke test: 300 iterations, 2 rounds (CLAUDE.md section 7 step 1)
+name: smoke
+lr: 0.1
+warmup_iters: 0
+sam_rho: null
+anchor_lam: null
+model: resnet20
+dataset: cifar10
+momentum: 0.9
+weight_decay: 1.0e-4
+batch_size: 128
+iters: 300
+milestones: [200, 250]
+lr_decay: 0.1
+prune_rate: 0.3
+output_prune_scale: 0.5     # final linear layer pruned at half the global rate
+rounds: 2
+seeds: [0]
+baselines: {reinit: [1, 2], shuffle: [2]}
+sharpness: {batch: 2048, iters: 20, micro_batch: 512, every: 100, dense_until: 300, then_every: 1500}
+divergence_val_acc: 0.15    # val acc below this = "ended at chance" -> diverged
+trained_acc: 0.20           # baseline counts as trained if test acc > 20%
+eval_batch: 1000

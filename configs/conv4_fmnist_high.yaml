@@ -1,0 +1,24 @@
+# Phase A de-risking chain (pilot P3): Conv-4 (no BN) on Fashion-MNIST at eta = 0.1, no warmup,
+# with the full S(t) trajectory, to see whether loss spikes / divergence coincide with S crossing 1.
+name: conv4_fmnist_high
+model: conv4
+dataset: fmnist
+lr: 0.1
+warmup_iters: 0
+sam_rho: null
+anchor_lam: null
+momentum: 0.9
+weight_decay: 1.0e-4
+batch_size: 128
+iters: 3000
+milestones: [2250]          # x0.1 at 75%, as in the pilot
+lr_decay: 0.1
+prune_rate: 0.6             # pilot rate: 60% per round, 5 rounds -> 1% remaining
+output_prune_scale: 0.5
+rounds: 5
+seeds: [0]
+baselines: {reinit: [1, 2, 3, 4, 5], shuffle: [1, 2, 3, 4, 5]}
+sharpness: {batch: 2048, iters: 20, micro_batch: 512, every: 50, dense_until: 1000, then_every: 500}
+divergence_val_acc: 0.15
+trained_acc: 0.20
+eval_batch: 1000
