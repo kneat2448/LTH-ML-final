@@ -196,3 +196,14 @@ Reminders:
     Session 2 starts at section 8, step 1.
   - Initialised git, first commit of the code, configs, notebook, notes and pilot (remote: kneat2448/LTH-ML-final).
   - Added README.md and pushed `main` to GitHub.
+- **2026-09-28, session 2 (Colab T4).**
+  - Cloned the repo into `MyDrive/final_project`. `pytest`: 20/20 pass on the T4 (66 s, torch 2.11 + cu128).
+  - No main-study run yet (still Gate 0; O1 and O4 still open).
+  - Re-analysed all pilot JSONs, including the `res_gpu_*` set, which the spec does not describe.
+    New script `analysis/pilot_summary.py` → `pilot_results/{pilot_summary.csv, pilot_tables.md, fig_pilot_acc.png, fig_pilot_spike.png}`.
+    Write-up: `pilot_results/PILOT_FINDINGS.md`.
+  - Key changes vs spec section 10:
+    - dense eta=0.1 collapse reproduced on GPU (P1 reversed);
+    - the high-LR ticket deficit is seed-dependent (P3 weakened);
+    - pilot lambda values look like the D1 power-iteration failure (P2 unverified);
+    - an early loss spike > 8x predicts failure, and it happens before step 200 (relevant to O1).
