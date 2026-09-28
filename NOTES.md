@@ -8,8 +8,8 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ## 1. Current status (2026-09-28, end of session 2, Colab T4)
 
-- **Phase:** section 7 step 1 (benchmark) on a **Colab T4**. The smoke benchmark ran with the new
-  O1 schedule (numbers in section 6). No Phase A run yet.
+- **Phase:** section 7 step 1 (benchmark) **done** on a **Colab T4** with the new O1 schedule (section 6):
+  ~9 min per 15k training, ~19 T4-h for Phase A+B. No Phase A run yet.
 - **O1 decided** (D11): 10 Lanczos steps, points at 0, 25, 50, 100, 200, every 500 to 3k, then every 3k, final.
 - **Runtime:** T4, so fp16 + GradScaler (D2). Budget is the spec's 30 T4-hours (built into `src/utils.py`,
   no `LTH_BUDGET_H` needed on a T4). O4 (G4 budget) only matters if you switch back to a G4.
@@ -134,25 +134,26 @@ python -m analysis.plots                                              # summary.
 ### 2026-09-28: Colab Tesla T4, smoke run with the O1 schedule (session 2)
 - torch 2.11.0+cu128, CUDA 12.8, fp16 autocast + GradScaler (D2). No throttling (1590/1590 MHz, 66 °C, 56 W).
 - First training (dense, 300 iters, 6 sharpness points): wall 137.9 s, of which sharpness 130.0 s.
-  - Training ≈ 38 it/s ≈ **26 ms/step** → one 15k run ≈ **6.5 min** without sharpness.
+  - Training: 38 it/s in the first (cold) run, **~72 it/s ≈ 14 ms/step** in the 5 later runs → one 15k run ≈ **3.5 min** without sharpness.
   - **One lambda_max (10 Lanczos steps, 2,048 images, fp32) ≈ 21.7 s.**
   - Peak VRAM **2.46 GB** (limit 6 GB, OK).
-- **Per 15k training with the O1 schedule (15 points): 6.5 + 15 × 0.36 ≈ 12 min** (sharpness overhead ≈ 83%,
+- **Per 15k training with the O1 schedule (15 points): 3.5 + 15 × 0.36 ≈ 9 min** (sharpness overhead ≈ 150%,
   still far above the spec's 15% rule; that rule cannot be met with a 2,048-image, 10-step Lanczos on any GPU).
-  This is right at the spec's 12-min threshold for cutting to 10k iterations; kept at 15k for now (see handoff).
+  Under the spec's 12-min threshold, so `iters` stays at 15k.
 - Dense smoke ticket (lr 0.1, 300 iters): acc 42.3%, R_0.2 0.80, max S(3k) 0.67, not diverged.
-- The rest of the smoke chain (r1/r2 ticket + reinit + shuffle) was still running when session 2 ended.
-  It is resumable: re-run `python -m src.imp configs/smoke.yaml` and finished trainings are skipped.
+- The full smoke chain finished (6 trainings: r0 ticket; r1 ticket + reinit; r2 ticket + reinit + shuffle), none diverged,
+  peak VRAM 2.46 GB in all. `python -m analysis.plots` runs end to end on it (its Gate A "NOT PASSED" is expected:
+  there are no low/warm03 chains yet). Derived files (summary.csv, figures, gate_a.md) are regenerated, so not committed.
 
 ### Re-derived budget (section 9 of the spec), T4, O1 schedule
 | Phase | Trainings | T4 GPU-h |
 |---|---|---|
 | Benchmark + tests | smoke | ~0.3 |
-| A: low, high, warm03, high_warm (seed 0) | ~60 | ~12 |
-| B: seed 1 of low/high/warm03 (~45) + H4 (18, SAM ≈ 2x training) | ~63 (+6 SAM-equivalents) | ~14 |
-| Reserve | | ~3.7 |
+| A: low, high, warm03, high_warm (seed 0) | ~60 | ~9 |
+| B: seed 1 of low/high/warm03 (~45) + H4 (18, SAM ≈ 2x training) | ~63 (+6 SAM-equivalents) | ~10 |
+| Reserve | | ~10.7 |
 | **Total** | | **~30** |
-- The Conv-4 chain is not included (O8). If trainings run slower than 12 min in practice, cut `iters` to 10k
+- About 19 T4-h for Phase A+B, leaving a large reserve. The Conv-4 chain is not included (O8). If trainings run slower than 12 min in practice, cut `iters` to 10k
   (milestones 6.7k/8.3k, warmup 6.7k) before cutting conditions or seeds (spec section 7).
 
 ## 7. Open issues
@@ -192,9 +193,8 @@ python -m analysis.plots                                              # summary.
    `!git -C /content/drive/MyDrive/final_project push https://<TOKEN>@github.com/kneat2448/LTH-ML-final.git main`
 2. **Session start on Colab (T4):** mount Drive, `cd /content/drive/MyDrive/final_project`,
    `mkdir -p /content/cifar_raw && cp data/cifar-10-python.tar.gz /content/cifar_raw/`, `export LTH_RAW_DATA=/content/cifar_raw`.
-3. **Finish the smoke run** (resumes): `python -m src.imp configs/smoke.yaml`. Check the r1/r2 rows in
-   `results/compute_log.csv` (sparse runs, baselines, peak VRAM) and that `python -m analysis.plots` works on it.
-4. **Phase A**, one chain at a time, each as its own long cell (~3 h per chain on the T4):
+3. ~~Smoke run~~: done on the T4 (section 6).
+4. **Phase A**, one chain at a time, each as its own long cell (~2.3 h per chain on the T4):
    `python -m src.imp configs/resnet20_low.yaml` → `resnet20_high` → `resnet20_warm03` → `resnet20_high_warm`.
    Conv-4 chain: only if `pilot/data/*.gz` is uploaded (O8). Then `python -m analysis.plots` and read `results/gate_a.md`.
    If Gate A fails, stop and write up why.
@@ -240,7 +240,7 @@ Reminders:
   - O1 decided by the user → D11 (10 Lanczos steps, 15 points incl. early steps 25/50/100/200). Code: new `early`
     key in `sharpness_steps`; configs, conftest and a new schedule test updated (21 tests pass).
   - CIFAR-10: the Toronto download was too slow, then blocked (O7). The user uploaded the laptop copy to `data/` (MD5 OK).
-  - Smoke benchmark on the T4: 26 ms/step, 21.7 s per lambda_max, 2.46 GB peak → ~12 min per 15k training.
-    Budget re-derived (section 6): Phase A+B ≈ 26 T4-h of the 30 h budget.
+  - Smoke benchmark on the T4 (all 6 trainings done): 14 ms/step warm, 21.5 s per lambda_max, 2.46 GB peak
+    → ~9 min per 15k training. Budget re-derived (section 6): Phase A+B ≈ 19 T4-h of the 30 h budget.
   - A GitHub push with a pasted token was blocked by the auto-mode permission check; commits are local only (step 1 of section 8).
-  - Session ended with the smoke chain still running (resumable).
+  - Next: Phase A (section 8, step 4).

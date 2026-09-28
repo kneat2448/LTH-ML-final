@@ -1,0 +1,13 @@
+COST ESTIMATE smoke: 6 trainings x 0.2 min = 0.02 GPU-h on Tesla T4; used so far 0.00 / 30.0 h
+[smoke seed0 r0 ticket] mode=plain remaining=1.0000
+   acc=0.4227 f1=0.4111 R02=0.797 maxS3k=0.670 diverged=False wall=2.3min sharp_overhead=1656.0% peakVRAM=2459MB
+[smoke seed0 r1 ticket] mode=plain remaining=0.7008
+   acc=0.4654 f1=0.4606 R02=0.804 maxS3k=0.315 diverged=False wall=2.2min sharp_overhead=3140.4% peakVRAM=2459MB
+[smoke seed0 r1 reinit] mode=plain remaining=0.7008
+   acc=0.4898 f1=0.4824 R02=0.779 maxS3k=1.017 diverged=False wall=2.2min sharp_overhead=3215.9% peakVRAM=2459MB
+[smoke seed0 r2 ticket] mode=plain remaining=0.4914
+   acc=0.5131 f1=0.5092 R02=0.776 maxS3k=0.492 diverged=False wall=2.2min sharp_overhead=3064.8% peakVRAM=2459MB
+[smoke seed0 r2 reinit] mode=plain remaining=0.4914
+   acc=0.5461 f1=0.5397 R02=0.730 maxS3k=0.661 diverged=False wall=2.2min sharp_overhead=3119.2% peakVRAM=2459MB
+[smoke seed0 r2 shuffle] mode=plain remaining=0.4914
+   acc=0.4907 f1=0.4814 R02=0.727 maxS3k=0.730 diverged=False wall=2.2min sharp_overhead=3073.9% peakVRAM=2459MB

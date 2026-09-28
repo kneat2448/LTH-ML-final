@@ -4,3 +4,9 @@ time,condition,seed,round,variant,model,mode,gpu,iters,wall_s,sharpness_s,it_per
 2026-09-28T13:49:16,smoke,0,1,reinit,resnet20,plain,NVIDIA GeForce RTX 4060 Laptop GPU,300,294.4,284.6,30.6,2450,False
 2026-09-28T13:57:16,smoke,0,2,ticket,resnet20,plain,NVIDIA GeForce RTX 4060 Laptop GPU,300,478.9,467.5,26.2,2450,False
 2026-09-28T14:05:02,smoke,0,2,reinit,resnet20,plain,NVIDIA GeForce RTX 4060 Laptop GPU,300,464.6,458.1,45.8,2450,False
+2026-09-28T10:57:07,smoke,0,0,ticket,resnet20,plain,Tesla T4,300,137.9,130.0,38.2,2459,False
+2026-09-28T10:59:21,smoke,0,1,ticket,resnet20,plain,Tesla T4,300,132.9,128.8,73.1,2459,False
+2026-09-28T11:01:34,smoke,0,1,reinit,resnet20,plain,Tesla T4,300,132.9,128.9,74.9,2459,False
+2026-09-28T11:03:48,smoke,0,2,ticket,resnet20,plain,Tesla T4,300,133.1,128.9,71.3,2459,False
+2026-09-28T11:06:02,smoke,0,2,reinit,resnet20,plain,Tesla T4,300,133.1,128.9,72.6,2459,False
+2026-09-28T11:08:16,smoke,0,2,shuffle,resnet20,plain,Tesla T4,300,133.0,128.8,71.6,2459,False
