@@ -35,7 +35,7 @@ REQUIRED_KEYS = {
     "trained_acc", "eval_batch",
 }
 H4_KEYS = {"mask_from", "variants", "anchor_lam_grid", "select_iters", "select_round", "select_target"}
-SHARPNESS_KEYS = {"batch", "iters", "micro_batch", "every", "dense_until", "then_every"}
+SHARPNESS_KEYS = {"batch", "iters", "micro_batch", "every", "dense_until", "then_every", "early"}
 EARLY_STEPS = 200      # window of the early loss spike
 LOSS_CHECK_EVERY = 50  # divergence check / loss-curve resolution
 S_WINDOW = 3000        # max_t S(t) is reported over the first 3k steps
@@ -71,9 +71,12 @@ def mode_of(cfg: dict) -> str:
 
 
 def sharpness_steps(cfg: dict, iters: int) -> list[int]:
-    """0, every `every` steps up to `dense_until`, then every `then_every`, and the final step."""
+    """0, the extra `early` steps, every `every` steps up to `dense_until`, then every `then_every`,
+    and the final step. `early` catches the loss spike, which the pilot saw before step 200
+    (pilot_results/PILOT_FINDINGS.md, F7)."""
     s = cfg["sharpness"]
-    steps = {0, iters} | set(range(s["every"], min(s["dense_until"], iters) + 1, s["every"]))
+    steps = {0, iters} | {t for t in s["early"] if t < iters}
+    steps |= set(range(s["every"], min(s["dense_until"], iters) + 1, s["every"]))
     steps |= set(range(s["dense_until"] + s["then_every"], iters, s["then_every"]))
     return sorted(steps)
 

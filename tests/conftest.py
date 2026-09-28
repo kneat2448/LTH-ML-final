@@ -26,7 +26,7 @@ def tiny_config(**over) -> dict:
         "weight_decay": 1e-4, "batch_size": 32, "iters": 10, "warmup_iters": 0, "milestones": [8],
         "lr_decay": 0.1, "sam_rho": None, "anchor_lam": None, "prune_rate": 0.3,
         "output_prune_scale": 0.5, "rounds": 1, "seeds": [0], "baselines": {},
-        "sharpness": {"batch": 64, "iters": 3, "micro_batch": 32, "every": 5, "dense_until": 10, "then_every": 100},
+        "sharpness": {"batch": 64, "iters": 3, "micro_batch": 32, "every": 5, "dense_until": 10, "then_every": 100, "early": []},
         "divergence_val_acc": 0.0, "trained_acc": 0.2, "eval_batch": 32,
     }
     cfg.update(over)

@@ -33,7 +33,15 @@ def test_lr_schedule():
 
 def test_sharpness_schedule():
     cfg = tiny_config(sharpness={"batch": 2048, "iters": 20, "micro_batch": 512, "every": 250,
-                                 "dense_until": 3000, "then_every": 1500})
+                                 "dense_until": 3000, "then_every": 1500, "early": []})
     steps = sharpness_steps(cfg, 15000)
     assert steps[:13] == list(range(0, 3001, 250))
     assert steps[13:] == [4500, 6000, 7500, 9000, 10500, 12000, 13500, 15000]
+
+
+def test_sharpness_schedule_o1():
+    """The O1 schedule adopted in session 2: early points, every 500 to 3k, then every 3k."""
+    cfg = tiny_config(sharpness={"batch": 2048, "iters": 10, "micro_batch": 512, "every": 500,
+                                 "dense_until": 3000, "then_every": 3000, "early": [25, 50, 100, 200]})
+    assert sharpness_steps(cfg, 15000) == [0, 25, 50, 100, 200, 500, 1000, 1500, 2000, 2500, 3000,
+                                           6000, 9000, 12000, 15000]

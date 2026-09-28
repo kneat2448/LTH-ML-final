@@ -17,7 +17,7 @@ output_prune_scale: 0.5     # final linear layer pruned at half the global rate
 rounds: 2
 seeds: [0]
 baselines: {reinit: [1, 2], shuffle: [2]}
-sharpness: {batch: 2048, iters: 20, micro_batch: 512, every: 100, dense_until: 300, then_every: 1500}
+sharpness: {batch: 2048, iters: 10, micro_batch: 512, every: 100, dense_until: 300, then_every: 1500, early: [25, 50]}
 divergence_val_acc: 0.15    # val acc below this = "ended at chance" -> diverged
 trained_acc: 0.20           # baseline counts as trained if test acc > 20%
 eval_batch: 1000

@@ -18,7 +18,7 @@ output_prune_scale: 0.5
 rounds: 5
 seeds: [0]
 baselines: {reinit: [1, 2, 3, 4, 5], shuffle: [1, 2, 3, 4, 5]}
-sharpness: {batch: 2048, iters: 20, micro_batch: 512, every: 50, dense_until: 1000, then_every: 500}
+sharpness: {batch: 2048, iters: 10, micro_batch: 512, every: 50, dense_until: 1000, then_every: 500, early: [10, 25]}
 divergence_val_acc: 0.15
 trained_acc: 0.20
 eval_batch: 1000
