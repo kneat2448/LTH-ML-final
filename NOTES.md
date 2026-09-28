@@ -6,17 +6,18 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ---
 
-## 1. Current status (2026-09-28, end of session 1)
+## 1. Current status (2026-09-28, end of session 2, Colab T4)
 
-- **Phase:** section 7 step 1 (benchmark). All code is written and tested (20 tests pass),
-  and the full pipeline has been checked end to end. No real experiment has run yet.
-- **Where to run:** moving to **Google Colab (G4)**. The folder is prepared for Drive (section 3).
-- **Before any Phase A run (Gate 0):**
-  1. **Decide the sharpness cost (O1).** Nothing else blocks Phase A.
-  2. Run the smoke benchmark on the Colab GPU (notebook cell 4–5), record the numbers in section 6,
-     and re-derive the section 9 budget table of the spec.
-  3. Set the GPU-hour budget for the G4 (O4) in the notebook's `LTH_BUDGET_H`.
-- **Then:** Phase A in the order of section 7: Conv-4 chain, low, high, warm03, high_warm → Gate A.
+- **Phase:** section 7 step 1 (benchmark) on a **Colab T4**. The smoke benchmark ran with the new
+  O1 schedule (numbers in section 6). No Phase A run yet.
+- **O1 decided** (D11): 10 Lanczos steps, points at 0, 25, 50, 100, 200, every 500 to 3k, then every 3k, final.
+- **Runtime:** T4, so fp16 + GradScaler (D2). Budget is the spec's 30 T4-hours (built into `src/utils.py`,
+  no `LTH_BUDGET_H` needed on a T4). O4 (G4 budget) only matters if you switch back to a G4.
+- **CIFAR-10:** `data/cifar-10-python.tar.gz` is on Drive (uploaded from the laptop, MD5 c58f3010… verified).
+  **Do not download it from cs.toronto.edu on Colab** (see O7). Copy it to local disk at session start:
+  `mkdir -p /content/cifar_raw && cp data/cifar-10-python.tar.gz /content/cifar_raw/` and set `LTH_RAW_DATA=/content/cifar_raw`.
+- **Git:** local commits exist that are **not pushed** (the push needs a GitHub token; run it yourself, see O3).
+- **Next:** Phase A in the order of section 7 (see section 8).
 
 ## 2. Quick start
 
@@ -110,6 +111,12 @@ python -m analysis.plots                                              # summary.
 - **D7.** If a ticket diverges, that round's baselines still run on its (good) mask. The chain then stops (`chain_stopped.json`).
 - **D8.** HVP micro-batches of 512 each use their own BN batch statistics. BN buffers are restored afterwards.
 - **D9.** SAM's second forward pass does not update BN running stats. Its perturbation direction is scale-invariant, so it works with GradScaler.
+- **D11. O1 resolved (session 2, user-approved): sharpness schedule.** `sharpness: {batch: 2048, iters: 10,
+  micro_batch: 512, every: 500, dense_until: 3000, then_every: 3000, early: [25, 50, 100, 200]}` in every main
+  config (smoke: `every: 100, early: [25, 50]`; conv4: `every: 50, early: [10, 25]`). New config key `early`
+  = extra measurement steps. They were added because the pilot's collapses happen before step 200
+  (`pilot_results/PILOT_FINDINGS.md`, F7). 15 points × 10 HVPs instead of 21 × 20 (≈ 2.8x cheaper).
+  Test: `tests/test_train.py::test_sharpness_schedule_o1`. State this deviation in the report.
 - **D10.** Conv-4 / Fashion-MNIST chain (`conv4_fmnist_high.yaml`): 3k iterations, 60%/round, 5 rounds (pilot rates),
   55k/5k train/val split, no augmentation.
 
@@ -124,13 +131,34 @@ python -m analysis.plots                                              # summary.
   (Best performance mode, vendor performance mode, airflow).
 - After the NCHW fix, still throttled: 20-step Lanczos ≈ 67 s; 10 steps ≈ 22 s.
 
-### Colab G4: not measured yet (fill in from notebook cell 5)
-- GPU name / torch / CUDA: …
-- ms per step, s per lambda, min per 15k run, peak VRAM: …
+### 2026-09-28: Colab Tesla T4, smoke run with the O1 schedule (session 2)
+- torch 2.11.0+cu128, CUDA 12.8, fp16 autocast + GradScaler (D2). No throttling (1590/1590 MHz, 66 °C, 56 W).
+- First training (dense, 300 iters, 6 sharpness points): wall 137.9 s, of which sharpness 130.0 s.
+  - Training ≈ 38 it/s ≈ **26 ms/step** → one 15k run ≈ **6.5 min** without sharpness.
+  - **One lambda_max (10 Lanczos steps, 2,048 images, fp32) ≈ 21.7 s.**
+  - Peak VRAM **2.46 GB** (limit 6 GB, OK).
+- **Per 15k training with the O1 schedule (15 points): 6.5 + 15 × 0.36 ≈ 12 min** (sharpness overhead ≈ 83%,
+  still far above the spec's 15% rule; that rule cannot be met with a 2,048-image, 10-step Lanczos on any GPU).
+  This is right at the spec's 12-min threshold for cutting to 10k iterations; kept at 15k for now (see handoff).
+- Dense smoke ticket (lr 0.1, 300 iters): acc 42.3%, R_0.2 0.80, max S(3k) 0.67, not diverged.
+- The rest of the smoke chain (r1/r2 ticket + reinit + shuffle) was still running when session 2 ended.
+  It is resumable: re-run `python -m src.imp configs/smoke.yaml` and finished trainings are skipped.
+
+### Re-derived budget (section 9 of the spec), T4, O1 schedule
+| Phase | Trainings | T4 GPU-h |
+|---|---|---|
+| Benchmark + tests | smoke | ~0.3 |
+| A: low, high, warm03, high_warm (seed 0) | ~60 | ~12 |
+| B: seed 1 of low/high/warm03 (~45) + H4 (18, SAM ≈ 2x training) | ~63 (+6 SAM-equivalents) | ~14 |
+| Reserve | | ~3.7 |
+| **Total** | | **~30** |
+- The Conv-4 chain is not included (O8). If trainings run slower than 12 min in practice, cut `iters` to 10k
+  (milestones 6.7k/8.3k, warmup 6.7k) before cutting conditions or seeds (spec section 7).
 
 ## 7. Open issues
 
-- **O1. Sharpness cost vs the 15%-overhead rule. USER DECISION NEEDED before Phase A.**
+- **O1. RESOLVED in session 2 → D11.** (Original text kept below for the record.)
+  Sharpness cost vs the 15%-overhead rule.
   One measurement = 20 HVPs on 2,048 images ≈ 1,300 training steps of compute. The spec's 21 points
   per run ≈ 190% overhead on **any** GPU; a faster GPU does not change the ratio. Options (they combine):
   - (a) **fewer Lanczos steps**: 10 steps were within 0.5% of the converged value on dense theta_0 (≈ 2x cheaper);
@@ -149,33 +177,34 @@ python -m analysis.plots                                              # summary.
 - **O4. Budget for the G4.** Sections 4 and 9 only cover the RTX 4060 (18 h) and a T4 (30 h). Agree on a
   G4 budget (compute units), set `LTH_BUDGET_H`, and note it in the spec's section 9.
 - **O5.** Laptop throttling (section 6). Irrelevant on Colab, but fix it before using the laptop again.
+- **O7. cs.toronto.edu blocks this Colab IP (session 2).** The single-connection download ran at ~55 kB/s. A
+  16-connection aria2c retry then triggered TLS handshake failures (probably rate limiting). Always use the Drive
+  copy in `data/` instead.
+- **O8. `pilot/data/` (Fashion-MNIST .gz) is not on Drive**, so `configs/conv4_fmnist_high.yaml` (the first
+  Phase A step) cannot run on Colab yet. Upload the four .gz files to `pilot/data/`, or skip the Conv-4 chain
+  (its purpose, de-risking H2, is partly covered by the pilot re-analysis).
 - **O6.** `results/compute_log.csv` contains 4 laptop rows from the archived smoke run (0.47 GPU-h, real time spent).
   They count toward the 4060 budget only (budgets are tracked per exact GPU name).
 
 ## 8. Handoff: what to do next (in order)
 
-1. **Upload:** unzip `ML_lab/final_project_drive.zip` into `MyDrive/final_project`
-   (or upload the folder without `checkpoints/`, `data/*.tar.gz`, papers, pptx).
-2. **Decide O1 (sharpness cost).** Recommendation from session 1: **10 Lanczos steps + fewer points**
-   (every 500 steps up to 3k, then every 3k, plus the final step). That's ≈ 4x cheaper and keeps the
-   2,048-image batch. Apply it to the `sharpness:` line of every config, smoke included:
-   `sharpness: {batch: 2048, iters: 10, micro_batch: 512, every: 500, dense_until: 3000, then_every: 3000}`.
-   Then check that `tests/test_train.py::test_sharpness_schedule` still reflects the chosen schedule
-   (it tests the spec's schedule via its own config, so it needs no change unless the defaults are meant to be tested).
-3. **Decide O4:** agree on a G4 GPU-hour budget, put it in notebook cell 2 (`LTH_BUDGET_H`), and add it to section 9 of the spec.
-4. ~~O3 git init~~: done (see section 7).
-5. **On Colab:** open `colab/run_on_colab.ipynb` with a G4 runtime and run cells 1–5 (mount, env, tests, smoke, benchmark summary).
-   Record GPU name, torch/CUDA versions, ms/step, s/lambda, min per 15k run and peak VRAM in section 6.
-   If one 15k training takes > 12 min, cut `iters` to 10k (milestones 6.7k/8.3k, warmup 6.7k) before cutting conditions or seeds.
-   Re-derive the section 9 budget table of the spec.
-6. **Phase A** (notebook cells, one at a time): conv4_fmnist_high → low → high → warm03 → high_warm, then
-   `python -m analysis.plots` and read `results/gate_a.md`. If Gate A fails, stop and write up why.
-7. **Phase B** only if Gate A passes: seed 1 of low/high/warm03, then H4 (`--select-lam` before the anchor run).
+1. **Push the unpushed commits** (run it yourself in a Colab cell, with a fresh token; revoke the one pasted in chat in session 2):
+   `!git -C /content/drive/MyDrive/final_project push https://<TOKEN>@github.com/kneat2448/LTH-ML-final.git main`
+2. **Session start on Colab (T4):** mount Drive, `cd /content/drive/MyDrive/final_project`,
+   `mkdir -p /content/cifar_raw && cp data/cifar-10-python.tar.gz /content/cifar_raw/`, `export LTH_RAW_DATA=/content/cifar_raw`.
+3. **Finish the smoke run** (resumes): `python -m src.imp configs/smoke.yaml`. Check the r1/r2 rows in
+   `results/compute_log.csv` (sparse runs, baselines, peak VRAM) and that `python -m analysis.plots` works on it.
+4. **Phase A**, one chain at a time, each as its own long cell (~3 h per chain on the T4):
+   `python -m src.imp configs/resnet20_low.yaml` → `resnet20_high` → `resnet20_warm03` → `resnet20_high_warm`.
+   Conv-4 chain: only if `pilot/data/*.gz` is uploaded (O8). Then `python -m analysis.plots` and read `results/gate_a.md`.
+   If Gate A fails, stop and write up why.
+5. **Phase B** only if Gate A passes: `--seeds 1` for low/high/warm03, then H4 (`--select-lam` before the anchor run).
 
 Reminders:
 - Do not `pip install -r requirements.txt` on Colab (Windows cu128 pins). Colab's preinstalled packages suffice.
 - Never run two training cells at once. After any code bug fix, archive affected results by hand
   (resume only compares configs, not code).
+- Do not download CIFAR-10 from cs.toronto.edu on Colab (O7); use the Drive copy.
 - The laptop GPU was throttled (O5). Fix the power settings before using it again.
 
 ## 9. Log
@@ -207,3 +236,11 @@ Reminders:
     - the high-LR ticket deficit is seed-dependent (P3 weakened);
     - pilot lambda values look like the D1 power-iteration failure (P2 unverified);
     - an early loss spike > 8x predicts failure, and it happens before step 200 (relevant to O1).
+- **2026-09-28, session 2 (continued).**
+  - O1 decided by the user → D11 (10 Lanczos steps, 15 points incl. early steps 25/50/100/200). Code: new `early`
+    key in `sharpness_steps`; configs, conftest and a new schedule test updated (21 tests pass).
+  - CIFAR-10: the Toronto download was too slow, then blocked (O7). The user uploaded the laptop copy to `data/` (MD5 OK).
+  - Smoke benchmark on the T4: 26 ms/step, 21.7 s per lambda_max, 2.46 GB peak → ~12 min per 15k training.
+    Budget re-derived (section 6): Phase A+B ≈ 26 T4-h of the 30 h budget.
+  - A GitHub push with a pasted token was blocked by the auto-mode permission check; commits are local only (step 1 of section 8).
+  - Session ended with the smoke chain still running (resumable).
