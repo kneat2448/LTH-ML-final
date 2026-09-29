@@ -361,3 +361,7 @@ Reminders:
     point counts against Gate A's `high` criterion. It is one seed, well within seed noise, so watch r4/r6/r8.
     The reinit had S(0) 0.817 and max S(25–3k) 0.334 (ticket 0.659 / 0.240).
     **warm03 r2 reinit 86.66% vs ticket 88.57% → +1.91 pp** (1st H1 point for warm03). No divergence.
+  - **06:50 UTC batch (tickets only; no baselines at these rounds):** low r5 (17.0%) 87.84% (+1.18 pp vs dense), max S(25–3k) 0.109.
+    **high r3 (34.5%) 88.36%: −1.47 pp vs dense**, the first high ticket clearly below dense (r1 −0.44, r2 −0.62, so the gap is
+    widening with sparsity); max S 0.244, S(0) 0.551. warm03 r3 (34.5%) 88.52% (+1.04 pp vs dense), max S 0.043.
+    No divergence, no spikes. Runtime 4.62 h. Next: r4 baselines for high/warm03, which decide the 24.2% H1 points.
