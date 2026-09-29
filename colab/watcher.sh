@@ -14,7 +14,8 @@ push() {
   for i in 1 2 3; do
     git push -q "https://$(cat $TOKEN_FILE)@github.com/kneat2448/LTH-ML-final.git" main 2>&1 \
       | sed -E 's#https://[^@]*@#https://***@#g'
-    [ "${PIPESTATUS[0]}" -eq 0 ] && { echo "$(date -u +%T) pushed"; return; }
+    # pushing to a URL does not move origin/main; update it so the retry check below is meaningful
+    [ "${PIPESTATUS[0]}" -eq 0 ] && { git update-ref refs/remotes/origin/main main; echo "$(date -u +%T) pushed"; return; }
     sleep 30
   done
   echo "$(date -u +%T) PUSH FAILED (commits are safe locally; retried next time)"
