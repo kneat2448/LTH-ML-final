@@ -206,6 +206,7 @@ to 10k before any condition or seed is cut.
 | warm03 | 0 | 1 | 70.1 | ticket | 88.22% | 0.000 | 0.051 | 0.496 | no |
 | warm03 | 0 | 2 | 49.1 | reinit | 86.66% | 0.000 | 0.092 | 0.456 | no |
 | warm03 | 0 | 2 | 49.1 | ticket | 88.57% | 0.000 | 0.045 | 0.447 | no |
+| warm03 | 0 | 3 | 34.5 | ticket | 88.52% | 0.000 | 0.043 | 0.391 | no |
 <!-- results-table:end -->
 
 **Observations so far (seed 0, single runs, directional only):**
