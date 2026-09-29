@@ -9,8 +9,11 @@ measured and what is still open. **Update it at the end of every work session.**
 ## 1. Current status (2026-09-29, session 3, Colab T4)
 
 - **Phase A started (session 3):** `resnet20_low` seed 0 is running (15 trainings, ~9.5 min each on the T4).
-  Each finished training is committed and pushed as it lands (one commit per result file, so `git log`
-  shows how far it got). **If the session died mid-chain, re-run
+  Each finished training is committed and pushed as it lands, by a watcher script in the session's scratchpad (not in the repo).
+  Before each commit it runs `python -m analysis.methodology_table`. One commit per result file, so `git log`
+  shows how far it got. **The watcher dies with the Colab session.** For later chains, either commit by hand after each
+  round (`python -m analysis.methodology_table && git add results/<cond> results/compute_log.csv Methodology.md`) or ask
+  Claude to start the watcher again. **If the session died mid-chain, re-run
   `python -m src.imp configs/resnet20_low.yaml`; finished trainings are skipped.** Then `resnet20_high` → `warm03` → `high_warm`.
 - **Git:** everything is pushed (session 2's commits included). The token is in `/content/drive/MyDrive/.secrets/github_token`
   (outside the repo, never committed); push command in section 8, step 1.
@@ -101,6 +104,8 @@ python -m analysis.plots                                              # summary.
 | `src/utils.py` | seeding, run metadata (git hash, versions, GPU), Tee, compute log, budgets (not in the spec's layout) |
 | `analysis/plots.py` | summary.csv, fig1–5, metrics_table.{md,csv}, ticket_advantage.csv, gate_a.md |
 | `analysis/pilot_summary.py` | session 2: re-analysis of all pilot JSONs → `pilot_results/{pilot_summary.csv, pilot_tables.md, fig_pilot_acc.png, fig_pilot_spike.png}` |
+| `Methodology.md` | session 3: the method as actually run, deviations to state in the report, study steps with status, results table (section 10) |
+| `analysis/methodology_table.py` | session 3: rewrites the results table in `Methodology.md` from `results/*/seed*/round*.json` |
 | `pilot_results/PILOT_FINDINGS.md` | session 2: pilot findings F1–F7 vs spec section 10 (2 seeds of the 4-epoch design: CPU + GPU re-run) |
 | `configs/` | smoke, resnet20_{low,high,warm03,high_warm}, conv4_fmnist_high, h4_high, h4_high_sam, h4_high_anchor |
 | `colab/run_on_colab.ipynb` | Colab runner (mount, env, tests, smoke, benchmark summary, Phase A/B cells) |
@@ -283,3 +288,8 @@ Reminders:
   - **low r0 (dense, eta 0.01):** test acc **86.66%** (F1 0.867, AUC 0.990), 9.3 min (sharpness overhead 151%, as predicted).
     lambda_max 25.5 at init, peak 30.9 at step 25, then down to ~8 by step 6k and 8.6 at the end. S = eta*lambda/(2(1+beta))
     peaks at 0.081 (step 25): the low-LR run stays far from the stability edge (S = 1), as H1 assumes. R_0.2 ends at 0.640.
+  - **low r1 (70.1%):** test acc **87.43%** (+0.77 pp over dense), max S(3k) **0.148** (about 1.8x dense at the same eta),
+    R_0.2 0.584. First sign that the stability ratio rises with sparsity at a fixed LR, which is the direction H2 needs.
+    It is still far below 1.
+  - Added `Methodology.md` (method as run, deviations, study steps and status, results table) and
+    `analysis/methodology_table.py`, which regenerates that table after every finished training.
