@@ -6,8 +6,18 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ---
 
-## 1. Current status (2026-09-29, session 3, Colab T4)
+## 1. Current status (2026-09-29, session 4, Colab T4)
 
+- **Now (07:30 UTC):** Phase A seed 0, three chains in parallel under MPS. Done: low r0–r6 ticket (r2/r4 baselines too), high r0–r4
+  ticket (r2 reinit, r4 reinit just in), warm03 r0–r4 ticket (r2 reinit). Running: low r6 reinit, warm03 r4 reinit, and the next high
+  training. Runtime used ≈ 5.3 h of 30. Findings so far are in the session-4 log (section 9).
+- **After a VM restart, run `bash colab/resume_phaseA.sh`** (copies CIFAR, starts MPS, relaunches any chain that is not running,
+  starts the watcher). Finished trainings are skipped; only the training in progress is lost (~25 min per chain).
+- **Watcher, now in the repo (`colab/watcher.sh`):** commits and pushes each finished result, and **every 15 min autosaves**
+  (regenerates `analysis.plots` + the Methodology table, commits changes in `results/`, `Methodology.md` and `NOTES.md`, pushes, and
+  retries failed pushes). Output: `/content/watcher.out`. Claude also adds a NOTES entry every ~15 min / per batch.
+- Derived analysis outputs (`results/summary.csv`, `figures/`, `gate_a.md`, …) **are committed since session 4** (user request),
+  and the autosave keeps them current.
 - **Session 4 (05:10 UTC):** the Colab VM had restarted, so no chains were running. The trainings in progress were lost
   (low r4, high r1, warm03 r1); every finished result was already committed. The three chains were relaunched under MPS with the
   same commands, and finished trainings were skipped. A new watcher (in the session scratchpad) commits each result and **pushes it**
@@ -128,6 +138,8 @@ python -m analysis.plots                                              # summary.
 | `pilot_results/PILOT_FINDINGS.md` | session 2: pilot findings F1–F7 vs spec section 10 (2 seeds of the 4-epoch design: CPU + GPU re-run) |
 | `configs/` | smoke, resnet20_{low,high,warm03,high_warm}, conv4_fmnist_high, h4_high, h4_high_sam, h4_high_anchor |
 | `colab/run_on_colab.ipynb` | Colab runner (mount, env, tests, smoke, benchmark summary, Phase A/B cells) |
+| `colab/watcher.sh` | session 4: commits + pushes each result, 15-min autosave of results/Methodology/NOTES |
+| `colab/resume_phaseA.sh` | session 4: one-command resume after a VM restart (CIFAR copy, MPS, chains, watcher) |
 | `tests/` | 23 tests (section 12 list plus schedules incl. the D11 schedule, NaN-mask guard, negative-dominant spectrum) |
 | `data/cifar-10-python.tar.gz` | official archive on Drive (not in git), uploaded from the laptop in session 2 |
 | `results/smoke/seed0/` | T4 smoke run with the D11 schedule (6 trainings); benchmark reference |
@@ -369,3 +381,6 @@ Reminders:
     −2.55 pp vs dense** (gap −0.44 → −0.62 → −1.47 → −2.55 pp with sparsity), max S 0.306, S(0) 0.438. **warm03 r4 (24.2%) 89.11%:
     +1.63 pp vs dense**, its best so far, max S 0.048. At 24.2% the warm03 ticket beats the high ticket by 1.8 pp. No divergence,
     no spikes. Runtime 5.02 h. Next: reinit baselines at low r6 / high r4 / warm03 r4.
+  - **07:30 UTC:** the user asked to save progress every 15 min so a runtime error loses nothing. The watcher moved from the scratchpad into
+    the repo (`colab/watcher.sh`) with a 15-min autosave and push retries. Added `colab/resume_phaseA.sh`. high r4 reinit landed at 07:25
+    (reported with the next batch).
