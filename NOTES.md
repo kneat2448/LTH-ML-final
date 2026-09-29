@@ -419,3 +419,8 @@ Reminders:
     Gate A (strict script): low PASS 3/3, warm03 2/2 (needs a 3rd), high FAIL (2 tiny wins). Runtime 6.21 h.
   - **08:40 UTC:** user decision D12 (Gate A `high` = no *winning* tickets). `analysis/plots.py::gate_a` changed, and `gate_a.md` regenerated:
     low PASS 3/3, high PASS 0/2 winning (2 positive-but-not-winning points listed), warm03 2/2, still needs a 3rd win.
+  - **08:42 UTC batch:** **low r8 reinit 80.13% vs ticket 86.13% → +6.00 pp at 6.0%** (low: +2.07 → +3.28 → +4.54 → +6.00, growing
+    monotonically with sparsity). The low r8 ticket is 0.53 pp below dense, just outside the 0.5 pp tolerance, so it is not a *winning*
+    ticket in the section-5 sense even though it beats the baselines by 6 pp. **high r6 (12.0%) ticket 85.52%: −4.31 pp vs dense**, max S(25–3k)
+    0.183. Running: low r8 shuffle (last low training), high r6 reinit, warm03 r6 ticket. Runtime 6.50 h.
+    (Monitoring note: count chains with `pgrep -f "^python3 -m src.imp"`; a looser `grep src.imp` also matches helper shells.)
