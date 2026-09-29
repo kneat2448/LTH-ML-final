@@ -353,3 +353,6 @@ Reminders:
     high r1 (70.1%) 89.39% (−0.44 pp vs dense), max S(25–3k) **0.536** vs 0.226 dense, but only at step 25 (lambda_max had not
     dropped yet: 0.536 → 0.10 by step 50), with no loss spike (1.16x); warm03 r1 (70.1%) 88.22% (+0.74 pp vs dense), max S 0.051.
     Parallel wall ≈ 23–25 min per training; runtime used 3.41 h of 30.
+  - **06:01 UTC batch:** low r4 reinit 84.64% vs ticket 87.92% → **ticket advantage +3.28 pp at 24.2%** (2nd H1 point for low).
+    high r2 (49.1%) 89.21% (−0.62 pp vs dense), max S(25–3k) back to 0.24 (the r1 0.536 did not repeat). warm03 r2 (49.1%) 88.57%
+    (+1.09 pp vs dense), max S 0.045. No divergence, no spikes. Runtime 3.81 h.
