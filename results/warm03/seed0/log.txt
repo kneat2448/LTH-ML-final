@@ -16,3 +16,5 @@ COST ESTIMATE warm03: 14 trainings x 15.9 min = 3.71 GPU-h on Tesla T4; used so 
 [warm03 seed0 r4 ticket] mode=warmup remaining=0.2420
    acc=0.8911 f1=0.8908 R02=0.340 maxS3k=0.048 diverged=False wall=24.0min sharp_overhead=79.2% peakVRAM=2460MB
 [warm03 seed0 r4 reinit] mode=warmup remaining=0.2420
+   acc=0.8524 f1=0.8520 R02=0.368 maxS3k=0.077 diverged=False wall=23.7min sharp_overhead=79.4% peakVRAM=2460MB
+[warm03 seed0 r4 shuffle] mode=warmup remaining=0.2420
