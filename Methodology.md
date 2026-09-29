@@ -225,6 +225,7 @@ to 10k before any condition or seed is cut.
 | warm03 | 0 | 4 | 24.2 | shuffle | 84.53% | 0.000 | 0.131 | 0.394 | no |
 | warm03 | 0 | 4 | 24.2 | ticket | 89.11% | 0.000 | 0.048 | 0.340 | no |
 | warm03 | 0 | 5 | 17.0 | ticket | 88.65% | 0.000 | 0.030 | 0.291 | no |
+| warm03 | 0 | 6 | 12.0 | ticket | 88.65% | 0.000 | 0.036 | 0.253 | no |
 <!-- results-table:end -->
 
 **Observations so far (seed 0, single runs, directional only):**
