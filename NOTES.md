@@ -323,3 +323,10 @@ Reminders:
   - The user asked to use the whole GPU. Benchmark (section 6): T4 compute-bound, 3 processes under MPS give +20% total throughput.
     Stopped `low` (its r3 training restarted from scratch, ~2 min lost), started the MPS daemon, relaunched `low`, `high` and
     `warm03` in parallel. The watcher now commits all conditions.
+  - **Results by 04:44 (parallel, MPS):** low r3 (34.5%) ticket 87.87%. **high r0 (dense, eta 0.1) 89.83%**, no collapse
+    (spike 1.19x), R_0.2 0.247. **warm03 r0 87.48%**, R_0.2 0.558. Details and interpretation are in `Methodology.md` section 10.
+  - **Found: max S(≤3k) is dominated by step 0 in runs without warmup.** high dense: S = 0.67 at step 0 (eta · lambda_max at init),
+    then ≤ 0.23, because lambda_max falls from 25.5 to 6.2 within 25 steps. H2 needs max S over steps ≥ 25, with S(0) reported
+    separately. **Proposal, needs approval** (it changes the H2 metric in `analysis/plots.py`; the raw trajectories are already
+    saved, so no re-run is needed).
+  - warm03 shows progressive sharpening during warmup (lambda_max 25 → 53 at step 2k) with S ≤ 0.08, the pattern Kalra & Barkeshli describe.

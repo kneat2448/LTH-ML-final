@@ -190,6 +190,19 @@ to 10k before any condition or seed is cut.
 | warm03 | 0 | 0 | 100.0 | ticket (dense) | 87.48% | 0.083 | 0.558 | no |
 <!-- results-table:end -->
 
-In `low` r0, lambda_max rises from 25.5 at init to 30.9 at step 25, then falls to ~8 by step 6k. At eta = 0.01, S never
-exceeds 0.08, so the low-LR network trains far below the stability edge, as H2 assumes for the
-winning condition.
+**Observations so far (seed 0, single runs, directional only):**
+- **Dense networks (r0).** high 89.83% > warm03 87.48% > low 86.66%. The high-LR dense network did not collapse
+  (loss spike 1.19x), unlike 2 of 3 pilot Conv-4 runs.
+- **Sharpness dynamics (dense).** All three conditions start from the same theta_0 (lambda_max 25.5).
+  - `low`: lambda_max stays ~25–31 early, then falls to ~8. S ≤ 0.08 throughout.
+  - `high`: lambda_max **drops from 25.5 to 6.2 within 25 steps** and to ~2 by step 1,000, so the network moves itself to a
+    flat region right away. S is 0.67 at step 0, then ≤ 0.23.
+  - `warm03`: lambda_max **rises during warmup** (progressive sharpening: 25 → 53 at step 2,000) while the small warmup LR keeps
+    S ≤ 0.08. It then falls to ~4 once the LR is large.
+- **Methodological issue in max S(≤3k).** For runs without warmup, the maximum is set by **step 0**, where S = eta · lambda_max(theta_0 ⊙ m)
+  is sharpness at initialization, before any update (0.67 for `high`). H2 is about *training-time* sharpness and
+  expects sharpness at init *not* to predict failure. The H2 analysis should therefore use max S over steps 25–3,000
+  (the `high` dense value is 0.226), and report step 0 separately. *Proposal; not yet implemented in `analysis/plots.py`.*
+- **Weight correlation.** Dense R_0.2 is 0.64 (low), 0.56 (warm03) and 0.25 (high; chance is 0.2), which agrees with Liu et al. A large LR
+  decorrelates theta_T from theta_0, and warmup keeps part of the correlation.
+- **Ticket advantage (low):** +2.07 pp over reinit at 49.1% remaining. Tickets stay at or above dense accuracy down to 34.5% (87.87%).
