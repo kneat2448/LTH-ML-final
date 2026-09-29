@@ -6,19 +6,23 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ---
 
-## 1. Current status (2026-09-28, end of session 2, Colab T4)
+## 1. Current status (2026-09-29, session 3, Colab T4)
 
-- **Phase:** section 7 step 1 (benchmark) **done** on a **Colab T4** with the new O1 schedule (section 6):
-  ~9 min per 15k training, ~19 T4-h for Phase A+B. No Phase A run yet.
+- **Phase A started (session 3):** `resnet20_low` seed 0 is running (15 trainings, ~9.5 min each on the T4).
+  Each finished training is committed and pushed as it lands (one commit per result file, so `git log`
+  shows how far it got). **If the session died mid-chain, re-run
+  `python -m src.imp configs/resnet20_low.yaml`; finished trainings are skipped.** Then `resnet20_high` → `warm03` → `high_warm`.
+- **Git:** everything is pushed (session 2's commits included). The token is in `/content/drive/MyDrive/.secrets/github_token`
+  (outside the repo, never committed); push command in section 8, step 1.
+- Earlier status (end of session 2): section 7 step 1 (benchmark) **done** on a **Colab T4** with the new O1 schedule (section 6):
+  ~9 min per 15k training, ~19 T4-h for Phase A+B.
 - **O1 decided** (D11): 10 Lanczos steps, points at 0, 25, 50, 100, 200, every 500 to 3k, then every 3k, final.
 - **Runtime:** T4, so fp16 + GradScaler (D2). Budget is the spec's 30 T4-hours (built into `src/utils.py`,
   no `LTH_BUDGET_H` needed on a T4). O4 (G4 budget) only matters if you switch back to a G4.
 - **CIFAR-10:** `data/cifar-10-python.tar.gz` is on Drive (uploaded from the laptop, MD5 c58f3010… verified).
   **Do not download it from cs.toronto.edu on Colab** (see O7). Copy it to local disk at session start:
   `mkdir -p /content/cifar_raw && cp data/cifar-10-python.tar.gz /content/cifar_raw/` and set `LTH_RAW_DATA=/content/cifar_raw`.
-- **Git:** every session-2 commit after `2cfb0de` is **local only** (list them with `git log origin/main..main`):
-  pilot re-analysis, O1 schedule, smoke results and NOTES updates. The push needs a GitHub token; run it yourself (section 8, step 1). Commits are authored as
-  `Nitai <nitaikoundinye@gmail.com>` (set in the repo's local git config on Colab).
+- Commits are authored as `Nitai <nitaikoundinye@gmail.com>` (set in the repo's local git config on Colab).
 - **Pilot re-analysis (session 2):** `pilot_results/PILOT_FINDINGS.md`. It changes how section 10 of the spec may be cited:
   P1 reversed (dense eta = 0.1 collapses in 2 of 3 runs), P3 weakened (high-LR ticket deficit is seed-dependent),
   P2 unverified (pilot lambda values look like the D1 power-iteration failure), and a new signal: an early loss spike > 8x
@@ -186,8 +190,9 @@ python -m analysis.plots                                              # summary.
 
   All of these are config/code changes that the spec says need approval. After the decision, update
   `sharpness:` in every config (the smoke config too) and re-run the smoke benchmark.
-- **O3. Resolved (2026-09-28); push pending since session 2.** Session-2 commits are local only (section 1).
-  A token pasted in chat in session 2 was not used (the push was blocked by the auto-mode permission check); **revoke it**.
+- **O3. Resolved (2026-09-28); pushed in session 3.** The token pasted in chat in session 2 was never used; revoke it.
+  A token needs write access: fine-grained → Contents: Read and write on this repo; classic → `repo` scope
+  (a read-only token gives `403 Permission ... denied`, as happened once in session 3).
   Original entry: Git repo initialised, remote `origin` = https://github.com/kneat2448/LTH-ML-final.git
   (branch `main`). Not committed on purpose: `data/`, `checkpoints/`, `*.pt`, `pilot/data/` (Fashion-MNIST .gz;
   get it from the Drive zip or zalandoresearch/fashion-mnist), `research paper/` (third-party PDFs), `*.zip`.
@@ -269,3 +274,12 @@ Reminders:
   - Proposals from the pilot re-analysis, not yet acted on: report a per-condition collapse rate in the main
     summary; cite P1 as "collapses in 2 of 3 short runs"; drop P2 or re-measure it with Lanczos.
   - Next: Phase A (section 8, step 4).
+- **2026-09-29, session 3 (Colab T4, ~2 h).**
+  - The user saved a GitHub token in `/content/drive/MyDrive/.secrets/github_token` (not in NOTES.md: this file is pushed,
+    and GitHub revokes tokens it finds in pushes). The first push got 403 (token without write access); after the user fixed
+    the permission, all session-2 commits were pushed.
+  - Started Phase A: `python -m src.imp configs/resnet20_low.yaml` (seed 0) in the background, with a watcher that commits and
+    pushes each new `results/low/seed0/round*.json`.
+  - **low r0 (dense, eta 0.01):** test acc **86.66%** (F1 0.867, AUC 0.990), 9.3 min (sharpness overhead 151%, as predicted).
+    lambda_max 25.5 at init, peak 30.9 at step 25, then down to ~8 by step 6k and 8.6 at the end. S = eta*lambda/(2(1+beta))
+    peaks at 0.081 (step 25): the low-LR run stays far from the stability edge (S = 1), as H1 assumes. R_0.2 ends at 0.640.
