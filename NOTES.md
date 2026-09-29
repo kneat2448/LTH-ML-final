@@ -356,3 +356,8 @@ Reminders:
   - **06:01 UTC batch:** low r4 reinit 84.64% vs ticket 87.92% → **ticket advantage +3.28 pp at 24.2%** (2nd H1 point for low).
     high r2 (49.1%) 89.21% (−0.62 pp vs dense), max S(25–3k) back to 0.24 (the r1 0.536 did not repeat). warm03 r2 (49.1%) 88.57%
     (+1.09 pp vs dense), max S 0.045. No divergence, no spikes. Runtime 3.81 h.
+  - **06:25 UTC batch (baselines):** low r4 shuffle 83.48% → low advantage at 24.2% stays **+3.28 pp** (best baseline = reinit).
+    **high r2 reinit 88.85% vs ticket 89.21% → +0.36 pp**. It is small and positive; H1 expects no advantage at high LR, so this
+    point counts against Gate A's `high` criterion. It is one seed, well within seed noise, so watch r4/r6/r8.
+    The reinit had S(0) 0.817 and max S(25–3k) 0.334 (ticket 0.659 / 0.240).
+    **warm03 r2 reinit 86.66% vs ticket 88.57% → +1.91 pp** (1st H1 point for warm03). No divergence.
