@@ -138,15 +138,16 @@ collapse rather than a systematic ticket deficit (F1, F2).
 | # | Step | Status |
 |---|---|---|
 | 0 | Pilot on Conv-4 / Fashion-MNIST (CPU + GPU re-run); re-analysis → `pilot_results/PILOT_FINDINGS.md` | **done** (sessions 1–2) |
-| 1 | Code + tests (21 tests pass on the T4) | **done** |
+| 1 | Code + tests (23 tests pass on the T4) | **done** |
 | 2 | Benchmark / smoke run on the T4: ~9 min per 15k training, 2.46 GB peak VRAM; budget re-derived | **done** (session 2) |
-| 3a | Phase A: `low` seed 0 (15 trainings) | **running** (session 3; r0 dense 86.66%) |
-| 3b | Phase A: `high`, `warm03`, `high_warm` seed 0 | pending |
+| 3a | Phase A: `low` seed 0 (15 trainings) | **running**, 13/15 (r8 reinit + shuffle left; expected done ≈ 09:05 UTC) |
+| 3b | Phase A: `high`, `warm03` seed 0 (15 each), in parallel with `low` under MPS | **running**: high 9/15, warm03 9/15 (expected done ≈ 10:30–10:45 UTC) |
+| 3b' | Phase A: `high_warm` seed 0 (15) | pending; starts automatically when `low` finishes (expected done ≈ 12:30 UTC) |
 | 3c | Conv-4 chain at eta = 0.1 with the full S(t) trajectory | optional; needs `pilot/data/*.gz` on Drive (O8) |
-| 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | pending |
+| 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | partial: low PASS (3/3), warm03 2/2 so far (needs r6/r8), high has two tiny positive advantages (see section 10) |
 | 5 | Phase B: seed 1 of `low`, `high` and `warm03` (error bars) | pending (after Gate A) |
 | 6 | Phase B: H4 (lam selection, then 3 conditions × 3 masks × ticket + shuffle) | pending |
-| 7 | Analysis: `python -m analysis.plots` → summary.csv, figs 1–5, metrics table, gate_a.md | script ready |
+| 7 | Analysis: `python -m analysis.plots` → summary.csv, figs 1–5, metrics table, gate_a.md | script ready; re-run every 15 min by the autosave |
 | 8 | `results/FINDINGS.md`: verdict + numbers for H1–H4; final report | pending |
 
 **Compute (T4, D11 schedule):** Phase A ≈ 9 GPU-h and Phase B ≈ 10 GPU-h of training. The budget is **30 h of Colab
@@ -236,4 +237,30 @@ to 10k before any condition or seed is cut.
   (the `high` dense value is 0.226), and report step 0 separately. *Adopted in session 4 (section 9); the table above and fig. 3 use it.*
 - **Weight correlation.** Dense R_0.2 is 0.64 (low), 0.56 (warm03) and 0.25 (high; chance is 0.2), which agrees with Liu et al. A large LR
   decorrelates theta_T from theta_0, and warmup keeps part of the correlation.
-- **Ticket advantage (low):** +2.07 pp over reinit at 49.1% remaining. Tickets stay at or above dense accuracy down to 34.5% (87.87%).
+- **Ticket accuracy vs dense, by sparsity (seed 0, as of 08:25 UTC):**
+
+  | % remaining | low (dense 86.66%) | high (dense 89.83%) | warm03 (dense 87.48%) |
+  |---|---|---|---|
+  | 70.1 | +0.77 | −0.44 | +0.74 |
+  | 49.1 | +1.19 | −0.62 | +1.09 |
+  | 34.5 | +1.21 | −1.47 | +1.04 |
+  | 24.2 | +1.26 | −2.55 | +1.63 |
+  | 17.0 | +1.18 | −3.70 | +1.17 |
+  | 12.0 | +0.93 | | |
+  | 8.4 | +0.51 | | |
+  | 6.0 | −0.53 | | |
+
+  Low-LR and warmup tickets stay above dense to ≤ 17% remaining. The high-LR ticket loses accuracy steadily with sparsity.
+- **Ticket advantage over the best trained baseline (pp):** low +2.07 (49.1%), +3.28 (24.2%), +4.54 (12.0%), growing with sparsity;
+  warm03 +1.91 (49.1%), +3.87 (24.2%); high +0.36 (49.1%), +0.13 (24.2%). The best baseline was always the reinit (shuffle is lower).
+- **Gate A reading.** low passes (3/3). warm03 has 2/2 so far; its r6 and r8 baselines decide it. high has two positive advantages,
+  so the literal "no wins at high" criterion in `analysis/plots.py` fails. They are 10–30x smaller than low/warm03 and likely within
+  seed noise (one seed). By the section-5 *winning-ticket* definition, which also requires ticket acc ≥ dense − 0.5 pp, high has **no**
+  winning ticket at either point (−0.62 and −2.55 pp vs dense). **Open question for the user:** should Gate A's `high` criterion use the
+  winning-ticket definition (or a minimum advantage), rather than any positive difference? No code has been changed.
+- **Sharpness (H2, max S over steps 25–3k).** low 0.08–0.15, warm03 0.03–0.08 and high 0.22–0.54 (tickets). No run comes near S = 1, and
+  no run has diverged or spiked. At the high LR, the reinit's S is similar to the ticket's (0.33 vs 0.24 at 49.1%; 0.31 vs 0.31 at
+  24.2%). So far S does not separate winning from failing tickets at eta = 0.1: the tickets fail without reaching the edge of stability.
+  This is a first hint against the simple H2 mechanism, pending more rounds and seed 1.
+- **Weight correlation (R_0.2).** It falls with sparsity in every condition (low 0.64 → 0.26, warm03 0.56 → 0.29) and stays near chance
+  for high (0.23–0.25 throughout).

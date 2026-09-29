@@ -8,9 +8,22 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ## 1. Current status (2026-09-29, session 4, Colab T4)
 
-- **Now (07:30 UTC):** Phase A seed 0, three chains in parallel under MPS. Done: low r0–r6 ticket (r2/r4 baselines too), high r0–r4
-  ticket (r2 reinit, r4 reinit just in), warm03 r0–r4 ticket (r2 reinit). Running: low r6 reinit, warm03 r4 reinit, and the next high
-  training. Runtime used ≈ 5.3 h of 30. Findings so far are in the session-4 log (section 9).
+- **Now (08:25 UTC): Phase A 31/60 trainings done (52%); whole study ≈ 31/123 (25%).**
+  | Chain | Done | Left | Expected finish (UTC) |
+  |---|---|---|---|
+  | low | 13/15 | r8 reinit, r8 shuffle | ≈ 09:05 |
+  | high | 9/15 | r6 ticket (running), r6 reinit, r7, r8 ticket + reinit + shuffle | ≈ 10:30 |
+  | warm03 | 9/15 | same as high | ≈ 10:45 |
+  | high_warm | 0/15 | all; **starts automatically when low finishes** (`colab/start_after.sh`, log `/content/start_after.out`) | ≈ 12:30 |
+  Rate since the 05:10 relaunch: 24 trainings in 3.2 h = **7.4 trainings/h** with 3 chains (23 min wall each, ~8 min effective).
+  high_warm runs alone after ~10:45 (~9.3 min per training).
+  **Forecast:** Phase A done ≈ 12:30 UTC today, at ≈ 10.5 h runtime used of 30 (≈ 6.2 h now). Gate A can be read then. Phase B
+  (seed 1 of low/high/warm03 = 45 trainings, plus H4 ≈ 18 trainings incl. SAM) ≈ 9 h more with 3 chains → total ≈ 20 h of 30,
+  leaving ≈ 10 h reserve, minus idle time that is not logged. If the VM restarts, each chain loses ≤ 25 min.
+- **Findings so far:** see `Methodology.md` section 10 (accuracy-vs-dense table, ticket advantages, Gate A reading, H2 sharpness).
+  Short version: low and warm03 tickets win (up to +4.5 / +3.9 pp over reinit); high tickets fall below dense as sparsity grows
+  (−3.7 pp at 17%). No run reaches S ≈ 1, including the failing high tickets. **Open question:** Gate A's `high` criterion (any positive
+  advantage vs the winning-ticket definition), since high has two tiny positive advantages (+0.36, +0.13 pp).
 - **After a VM restart, run `bash colab/resume_phaseA.sh`** (copies CIFAR, starts MPS, relaunches any chain that is not running,
   starts the watcher). Finished trainings are skipped; only the training in progress is lost (~25 min per chain).
 - **Watcher, now in the repo (`colab/watcher.sh`):** commits and pushes each finished result, and **every 15 min autosaves**
@@ -139,7 +152,8 @@ python -m analysis.plots                                              # summary.
 | `configs/` | smoke, resnet20_{low,high,warm03,high_warm}, conv4_fmnist_high, h4_high, h4_high_sam, h4_high_anchor |
 | `colab/run_on_colab.ipynb` | Colab runner (mount, env, tests, smoke, benchmark summary, Phase A/B cells) |
 | `colab/watcher.sh` | session 4: commits + pushes each result, 15-min autosave of results/Methodology/NOTES |
-| `colab/resume_phaseA.sh` | session 4: one-command resume after a VM restart (CIFAR copy, MPS, chains, watcher) |
+| `colab/resume_phaseA.sh` | session 4: one-command resume after a VM restart (CIFAR copy, MPS, chains, watcher); default = all four Phase A chains |
+| `colab/start_after.sh` | session 4: start one chain when another finishes (used for low → high_warm) |
 | `tests/` | 23 tests (section 12 list plus schedules incl. the D11 schedule, NaN-mask guard, negative-dominant spectrum) |
 | `data/cifar-10-python.tar.gz` | official archive on Drive (not in git), uploaded from the laptop in session 2 |
 | `results/smoke/seed0/` | T4 smoke run with the D11 schedule (6 trainings); benchmark reference |
@@ -394,3 +408,7 @@ Reminders:
   - **08:08 UTC check:** low r7 (8.4%) ticket 87.17% (+0.51 pp vs dense, slowly falling toward dense). **high r5 (17.0%) ticket 86.13%:
     −3.70 pp vs dense** (the gap keeps widening), max S(25–3k) 0.248. warm03 r4 shuffle 84.53%, so the warm03 advantage at 24.2% stays +3.87 pp
     (best baseline = reinit). Running: low r8 ticket (5.97%, the last low round), warm03 r5 ticket, the next high training. Runtime 5.96 h.
+  - **08:25 UTC:** low r8 (6.0%) ticket 86.13%, the first low ticket below dense (−0.53 pp). warm03 r5 (17.0%) 88.65% (+1.17 pp), max S 0.030.
+    Updated `Methodology.md` (step statuses, accuracy-vs-dense table, advantages, Gate A reading, H2 observation). Added
+    `colab/start_after.sh` and started it: high_warm launches when low exits. The `resume_phaseA.sh` default now covers all four chains.
+    Gate A (strict script): low PASS 3/3, warm03 2/2 (needs a 3rd), high FAIL (2 tiny wins). Runtime 6.21 h.
