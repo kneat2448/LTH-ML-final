@@ -10,8 +10,8 @@ measured and what is still open. **Update it at the end of every work session.**
 
 - **Session 4 (05:10 UTC):** the Colab VM had restarted, so no chains were running. The trainings in progress were lost
   (low r4, high r1, warm03 r1); every finished result was already committed. The three chains were relaunched under MPS with the
-  same commands, and finished trainings were skipped. A new watcher (in the session scratchpad) **commits locally only; it does not push**.
-  Push by hand with section 8, step 1. Remaining: low 10, high 14, warm03 14 trainings (~25 min each in parallel)
+  same commands, and finished trainings were skipped. A new watcher (in the session scratchpad) commits each result and **pushes it**
+  (token read from Drive `.secrets`; the token is never printed). Remaining: low 10, high 14, warm03 14 trainings (~25 min each in parallel)
   → low done ≈ 09:30, high/warm03 ≈ 11:00 UTC, if the VM survives. Then `high_warm`.
 - **Budget redefined (session 4, user):** the budget is **30 h of Colab runtime (wall-clock usage), not GPU-hours**. At 05:10 UTC
   on 2026-09-29, 27 h were left. `src/utils.py`: `RUNTIME_USED_BEFORE_H = 3.0` at `RUNTIME_SINCE`, plus the **union** of the
