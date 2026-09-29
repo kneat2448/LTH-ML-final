@@ -389,3 +389,5 @@ Reminders:
     → +0.13 pp**: tiny, but the second small positive high point (r2 +0.36), so the strict Gate A 'high: no wins' criterion keeps
     failing even though the high advantage is an order of magnitude smaller than low/warm03. The r4 shuffles (high, warm03) are still to come.
     Runtime 5.42 h.
+  - **07:53 UTC check:** high r4 shuffle 87.11% (07:47), so the high advantage at 24.2% stays +0.13 pp (best baseline = reinit 87.15%). The first 15-min autosave ran at 07:47 and pushed. Running: low r7 ticket (8.4%),
+    high r5 ticket (17.0%), warm03 r4 shuffle. Runtime 5.59 h.
