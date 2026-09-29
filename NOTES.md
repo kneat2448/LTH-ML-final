@@ -15,6 +15,13 @@ measured and what is still open. **Update it at the end of every work session.**
   round (`python -m analysis.methodology_table && git add results/<cond> results/compute_log.csv Methodology.md`) or ask
   Claude to start the watcher again. **If the session died mid-chain, re-run
   `python -m src.imp configs/resnet20_low.yaml`; finished trainings are skipped.** Then `resnet20_high` → `warm03` → `high_warm`.
+- **Parallel chains under MPS (session 3, user request):** `low`, `high` and `warm03` run at the same time, as 3 processes under
+  NVIDIA MPS. Start the daemon before any CUDA process:
+  `export CUDA_MPS_PIPE_DIRECTORY=/tmp/mps_pipe CUDA_MPS_LOG_DIRECTORY=/tmp/mps_log; mkdir -p $CUDA_MPS_PIPE_DIRECTORY $CUDA_MPS_LOG_DIRECTORY; nvidia-cuda-mps-control -d`,
+  then launch each chain with the same env vars (`nohup python -m src.imp configs/resnet20_<c>.yaml > /content/phaseA_<c>.out 2>&1 &`).
+  The gain is only ~20% in total throughput (section 6), and each chain runs ~3x slower. **Wall times, `it_per_s`, sharpness
+  overhead and `compute_log.csv` GPU-hours of parallel runs are inflated (~2.5x per run)**, so do not use them for timing or budget.
+  Real GPU use ≈ wall time of the session.
 - **Git:** everything is pushed (session 2's commits included). The token is in `/content/drive/MyDrive/.secrets/github_token`
   (outside the repo, never committed); push command in section 8, step 1.
 - Earlier status (end of session 2): section 7 step 1 (benchmark) **done** on a **Colab T4** with the new O1 schedule (section 6):
@@ -170,6 +177,21 @@ python -m analysis.plots                                              # summary.
   peak VRAM 2.46 GB in all. `python -m analysis.plots` runs end to end on it (its Gate A "NOT PASSED" is expected:
   there are no low/warm03 chains yet). Derived files (summary.csv, figures, gate_a.md) are regenerated, so not committed.
 
+### 2026-09-29: parallel training on the T4 (session 3)
+Synthetic ResNet-20 training loop (fp16 + GradScaler, batch 128, 1,000 steps, no sharpness), total it/s over all processes:
+
+| Setup | Total it/s | vs 1 process |
+|---|---|---|
+| 1 process | 70.6 | 1.00x |
+| 3 processes, no MPS (time-slicing) | 79.4 | 1.12x |
+| 2 processes, MPS | 84.0 | 1.19x |
+| 3 processes, MPS | 85.0 | 1.20x |
+| 4 processes, MPS | 82.0 | 1.16x |
+
+- The T4 is **compute-bound** with one ResNet-20 run (99% util). VRAM (~3 GB per process of 15 GB) and RAM (~2 GB per process
+  of 12 GB) are not the limit, and the VM has only 2 CPU cores. More processes cannot use the spare memory to go faster.
+- Choice: 3 chains under MPS (+20%). This cuts Phase A from ~9 to ~7.5 T4-h of wall time.
+
 ### Re-derived budget (section 9 of the spec), T4, O1 schedule
 | Phase | Trainings | T4 GPU-h |
 |---|---|---|
@@ -233,7 +255,7 @@ python -m analysis.plots                                              # summary.
 
 Reminders:
 - Do not `pip install -r requirements.txt` on Colab (Windows cu128 pins). Colab's preinstalled packages suffice.
-- Never run two training cells at once. After any code bug fix, archive affected results by hand
+- Never run two training cells at once *without MPS* (time-slicing gains only 12%). With MPS, up to 3 chains (section 6). After any code bug fix, archive affected results by hand
   (resume only compares configs, not code).
 - Do not download CIFAR-10 from cs.toronto.edu on Colab (O7); use the Drive copy.
 - The laptop GPU was throttled (O5). Fix the power settings before using it again.
@@ -297,3 +319,7 @@ Reminders:
     At eta = 0.01, S stays in 0.03–0.09 at every sparsity so far, apart from single-point jumps. max S over one
     trajectory is **sensitive to single-point noise**, so fig. 3 should also show a robust statistic
     (e.g. the median of the early points). This is a proposal, not implemented.
+  - **low r2 reinit:** 85.78% vs ticket 87.85% → **ticket advantage +2.07 pp at 49.1%**, the first H1 data point, in the expected direction.
+  - The user asked to use the whole GPU. Benchmark (section 6): T4 compute-bound, 3 processes under MPS give +20% total throughput.
+    Stopped `low` (its r3 training restarted from scratch, ~2 min lost), started the MPS daemon, relaunched `low`, `high` and
+    `warm03` in parallel. The watcher now commits all conditions.
