@@ -365,3 +365,7 @@ Reminders:
     **high r3 (34.5%) 88.36%: −1.47 pp vs dense**, the first high ticket clearly below dense (r1 −0.44, r2 −0.62, so the gap is
     widening with sparsity); max S 0.244, S(0) 0.551. warm03 r3 (34.5%) 88.52% (+1.04 pp vs dense), max S 0.043.
     No divergence, no spikes. Runtime 4.62 h. Next: r4 baselines for high/warm03, which decide the 24.2% H1 points.
+  - **07:13 UTC batch (tickets):** low r6 (12.0%) 87.59% (+0.93 pp vs dense), max S(25–3k) 0.077. **high r4 (24.2%) 87.28%:
+    −2.55 pp vs dense** (gap −0.44 → −0.62 → −1.47 → −2.55 pp with sparsity), max S 0.306, S(0) 0.438. **warm03 r4 (24.2%) 89.11%:
+    +1.63 pp vs dense**, its best so far, max S 0.048. At 24.2% the warm03 ticket beats the high ticket by 1.8 pp. No divergence,
+    no spikes. Runtime 5.02 h. Next: reinit baselines at low r6 / high r4 / warm03 r4.
