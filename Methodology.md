@@ -185,6 +185,9 @@ to 10k before any condition or seed is cut.
 | low | 0 | 1 | 70.1 | ticket | 87.43% | 0.148 | 0.584 | no |
 | low | 0 | 2 | 49.1 | reinit | 85.78% | 0.084 | 0.550 | no |
 | low | 0 | 2 | 49.1 | ticket | 87.85% | 0.085 | 0.525 | no |
+| low | 0 | 3 | 34.5 | ticket | 87.87% | 0.087 | 0.465 | no |
+| high | 0 | 0 | 100.0 | ticket (dense) | 89.83% | 0.670 | 0.247 | no |
+| warm03 | 0 | 0 | 100.0 | ticket (dense) | 87.48% | 0.083 | 0.558 | no |
 <!-- results-table:end -->
 
 In `low` r0, lambda_max rises from 25.5 at init to 30.9 at step 25, then falls to ~8 by step 6k. At eta = 0.01, S never
