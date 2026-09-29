@@ -183,6 +183,7 @@ to 10k before any condition or seed is cut.
 |---|---|---|---|---|---|---|---|---|
 | low | 0 | 0 | 100.0 | ticket (dense) | 86.66% | 0.081 | 0.640 | no |
 | low | 0 | 1 | 70.1 | ticket | 87.43% | 0.148 | 0.584 | no |
+| low | 0 | 2 | 49.1 | ticket | 87.85% | 0.085 | 0.525 | no |
 <!-- results-table:end -->
 
 In `low` r0, lambda_max rises from 25.5 at init to 30.9 at step 25, then falls to ~8 by step 6k. At eta = 0.01, S never
