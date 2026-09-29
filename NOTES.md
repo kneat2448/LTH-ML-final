@@ -349,3 +349,7 @@ Reminders:
     (union of training intervals plus a calibrated offset), `LTH_BUDGET_H` removed (notebook too), test `tests/test_utils.py`.
   - User approved the H2 fix → `stability_summary` (S0, max_S_train over steps 25–3k), fig. 3 (S(0) as hollow markers), fig. 5,
     the Methodology table and the deviation list. Test in `tests/test_metrics.py`. 23 tests pass.
+  - **First results after the relaunch (05:34–05:36 UTC, pushed by the watcher):** low r4 (24.2%) ticket 87.92% (still above dense);
+    high r1 (70.1%) 89.39% (−0.44 pp vs dense), max S(25–3k) **0.536** vs 0.226 dense, but only at step 25 (lambda_max had not
+    dropped yet: 0.536 → 0.10 by step 50), with no loss spike (1.16x); warm03 r1 (70.1%) 88.22% (+0.74 pp vs dense), max S 0.051.
+    Parallel wall ≈ 23–25 min per training; runtime used 3.41 h of 30.
