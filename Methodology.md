@@ -176,9 +176,14 @@ to 10k before any condition or seed is cut.
 
 ## 10. Results so far
 
-| Condition | Round | % remaining | Variant | Test acc | max S(≤3k) | R_0.2 | Diverged |
-|---|---|---|---|---|---|---|---|
-| low | 0 | 100 | ticket (dense) | 86.66% | 0.081 | 0.640 | no |
+*The table is regenerated from `results/` by `python -m analysis.methodology_table` after every finished training.*
+
+<!-- results-table:start -->
+| Condition | Seed | Round | % remaining | Variant | Test acc | max S(≤3k) | R_0.2 | Diverged |
+|---|---|---|---|---|---|---|---|---|
+| low | 0 | 0 | 100.0 | ticket (dense) | 86.66% | 0.081 | 0.640 | no |
+| low | 0 | 1 | 70.1 | ticket | 87.43% | 0.148 | 0.584 | no |
+<!-- results-table:end -->
 
 In `low` r0, lambda_max rises from 25.5 at init to 30.9 at step 25, then falls to ~8 by step 6k. At eta = 0.01, S never
 exceeds 0.08, so the low-LR network trains far below the stability edge, as H2 assumes for the
