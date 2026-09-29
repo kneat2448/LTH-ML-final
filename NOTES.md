@@ -424,3 +424,7 @@ Reminders:
     ticket in the section-5 sense even though it beats the baselines by 6 pp. **high r6 (12.0%) ticket 85.52%: −4.31 pp vs dense**, max S(25–3k)
     0.183. Running: low r8 shuffle (last low training), high r6 reinit, warm03 r6 ticket. Runtime 6.50 h.
     (Monitoring note: count chains with `pgrep -f "^python3 -m src.imp"`; a looser `grep src.imp` also matches helper shells.)
+  - **08:58 UTC check:** high r6 reinit 85.13% vs ticket 85.52% → +0.39 pp at 12.0%, but the ticket is 4.31 pp below dense, so it is **not a
+    winning ticket** (D12). high is now 0/3 winning, with 3 tiny positive advantages (+0.36, +0.13, +0.39). **warm03 r6 (12.0%) ticket 88.65%
+    (+1.17 pp vs dense)**, max S 0.036. The warm03 r6 reinit (running) will likely give warm03's 3rd Gate A win. low r8 shuffle is still running
+    (low's last training); high_warm not yet started. Runtime 6.70 h.
