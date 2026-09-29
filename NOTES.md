@@ -8,6 +8,13 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ## 1. Current status (2026-09-29, session 3, Colab T4)
 
+- **Session 4 (05:10 UTC):** the Colab VM had restarted, so no chains were running. The trainings in progress were lost
+  (low r4, high r1, warm03 r1); every finished result was already committed. The three chains were relaunched under MPS with the
+  same commands, and finished trainings were skipped. A new watcher (in the session scratchpad) **commits locally only; it does not push**.
+  Push by hand with section 8, step 1. Remaining: low 10, high 14, warm03 14 trainings (~25 min each in parallel)
+  → low done ≈ 09:30, high/warm03 ≈ 11:00 UTC, if the VM survives. Then `high_warm`.
+  **Budget alarm risk:** `compute_log.csv` books ~0.42 GPU-h per parallel training (inflated ~2.5x, see below). That would reach ~18 h
+  by the end of these three chains, so the built-in 30 h alarm could fire during Phase B even though real use is far lower.
 - **Phase A started (session 3):** `resnet20_low` seed 0 is running (15 trainings, ~9.5 min each on the T4).
   Each finished training is committed and pushed as it lands, by a watcher script in the session's scratchpad (not in the repo).
   Before each commit it runs `python -m analysis.methodology_table`. One commit per result file, so `git log`
