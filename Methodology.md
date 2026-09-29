@@ -144,7 +144,7 @@ collapse rather than a systematic ticket deficit (F1, F2).
 | 3b | Phase A: `high`, `warm03` seed 0 (15 each), in parallel with `low` under MPS | **running**: high 9/15, warm03 9/15 (expected done ≈ 10:30–10:45 UTC) |
 | 3b' | Phase A: `high_warm` seed 0 (15) | pending; starts automatically when `low` finishes (expected done ≈ 12:30 UTC) |
 | 3c | Conv-4 chain at eta = 0.1 with the full S(t) trajectory | optional; needs `pilot/data/*.gz` on Drive (O8) |
-| 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | partial: low PASS (3/3), warm03 2/2 so far (needs r6/r8), high has two tiny positive advantages (see section 10) |
+| 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | partial: low PASS (3/3), high PASS (0 winning tickets, D12), warm03 2/2 so far (needs r6/r8) |
 | 5 | Phase B: seed 1 of `low`, `high` and `warm03` (error bars) | pending (after Gate A) |
 | 6 | Phase B: H4 (lam selection, then 3 conditions × 3 masks × ticket + shuffle) | pending |
 | 7 | Analysis: `python -m analysis.plots` → summary.csv, figs 1–5, metrics table, gate_a.md | script ready; re-run every 15 min by the autosave |
@@ -179,6 +179,9 @@ to 10k before any condition or seed is cut.
   lambda_max drops from 25.5 to 6.2 within 25 steps). That is sharpness at init, which H2 says should *not* predict failure.
   Only the analysis changed; the raw trajectories were already saved, so no run was repeated. The run JSONs still
   contain the old `max_S_3k` field.
+- **Gate A criterion for `high` (D12, user decision).** "Tickets do not beat baselines at high LR" is judged with the section-5
+  winning-ticket definition: advantage > 0 **and** ticket acc ≥ dense − 0.5 pp. Any positive advantage alone does not count.
+  high's two positive advantages (+0.36, +0.13 pp) came with tickets 0.62 and 2.55 pp below dense.
 - **Pilot re-interpretation:** P1 is reversed (dense eta = 0.1 collapses in 2 of 3 short runs), P3 is weakened
   (seed-dependent), and P2 is unverified (likely the D1 artifact). See `pilot_results/PILOT_FINDINGS.md`.
 
@@ -254,10 +257,10 @@ to 10k before any condition or seed is cut.
 - **Ticket advantage over the best trained baseline (pp):** low +2.07 (49.1%), +3.28 (24.2%), +4.54 (12.0%), growing with sparsity;
   warm03 +1.91 (49.1%), +3.87 (24.2%); high +0.36 (49.1%), +0.13 (24.2%). The best baseline was always the reinit (shuffle is lower).
 - **Gate A reading.** low passes (3/3). warm03 has 2/2 so far; its r6 and r8 baselines decide it. high has two positive advantages,
-  so the literal "no wins at high" criterion in `analysis/plots.py` fails. They are 10–30x smaller than low/warm03 and likely within
+  so a literal "no positive advantage at high" criterion would fail. They are 10–30x smaller than low/warm03 and likely within
   seed noise (one seed). By the section-5 *winning-ticket* definition, which also requires ticket acc ≥ dense − 0.5 pp, high has **no**
-  winning ticket at either point (−0.62 and −2.55 pp vs dense). **Open question for the user:** should Gate A's `high` criterion use the
-  winning-ticket definition (or a minimum advantage), rather than any positive difference? No code has been changed.
+  winning ticket at either point (−0.62 and −2.55 pp vs dense). **Decision (D12): Gate A's `high` criterion uses the winning-ticket
+  definition**, so high passes.
 - **Sharpness (H2, max S over steps 25–3k).** low 0.08–0.15, warm03 0.03–0.08 and high 0.22–0.54 (tickets). No run comes near S = 1, and
   no run has diverged or spiked. At the high LR, the reinit's S is similar to the ticket's (0.33 vs 0.24 at 49.1%; 0.31 vs 0.31 at
   24.2%). So far S does not separate winning from failing tickets at eta = 0.1: the tickets fail without reaching the edge of stability.

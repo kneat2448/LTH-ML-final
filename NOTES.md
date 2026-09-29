@@ -22,8 +22,8 @@ measured and what is still open. **Update it at the end of every work session.**
   leaving ≈ 10 h reserve, minus idle time that is not logged. If the VM restarts, each chain loses ≤ 25 min.
 - **Findings so far:** see `Methodology.md` section 10 (accuracy-vs-dense table, ticket advantages, Gate A reading, H2 sharpness).
   Short version: low and warm03 tickets win (up to +4.5 / +3.9 pp over reinit); high tickets fall below dense as sparsity grows
-  (−3.7 pp at 17%). No run reaches S ≈ 1, including the failing high tickets. **Open question:** Gate A's `high` criterion (any positive
-  advantage vs the winning-ticket definition), since high has two tiny positive advantages (+0.36, +0.13 pp).
+  (−3.7 pp at 17%). No run reaches S ≈ 1, including the failing high tickets. **Gate A for high uses the winning-ticket definition (D12)** →
+  high PASS (0 winning tickets). Gate A now: low PASS, high PASS, warm03 2/2 (its r6 or r8 baseline decides it).
 - **After a VM restart, run `bash colab/resume_phaseA.sh`** (copies CIFAR, starts MPS, relaunches any chain that is not running,
   starts the watcher). Finished trainings are skipped; only the training in progress is lost (~25 min per chain).
 - **Watcher, now in the repo (`colab/watcher.sh`):** commits and pushes each finished result, and **every 15 min autosaves**
@@ -187,6 +187,11 @@ python -m analysis.plots                                              # summary.
   = extra measurement steps. They were added because the pilot's collapses happen before step 200
   (`pilot_results/PILOT_FINDINGS.md`, F7). 15 points × 10 HVPs instead of 21 × 20 (≈ 2.8x cheaper).
   Test: `tests/test_train.py::test_sharpness_schedule_o1`. State this deviation in the report.
+- **D12. Gate A `high` criterion (session 4, user decision, 08:40 UTC):** for `high`, Gate A counts only *winning tickets*
+  in the section-5 sense (advantage over the best trained baseline > 0 **and** ticket acc ≥ dense − 0.5 pp; with ≥ 2 seeds, mean > 2 SE),
+  not any positive advantage. Reason: high had two tiny positive advantages (+0.36 pp at 49.1%, +0.13 pp at 24.2%) while its tickets
+  were 0.62 and 2.55 pp below dense. The low/warm03 criterion is unchanged (advantage > 0 at ≥ 3 sparsities). `analysis/plots.py::gate_a`
+  now also lists high's positive-but-not-winning points in `gate_a.md`. State this in the report.
 - **D10.** Conv-4 / Fashion-MNIST chain (`conv4_fmnist_high.yaml`): 3k iterations, 60%/round, 5 rounds (pilot rates),
   55k/5k train/val split, no augmentation.
 
@@ -412,3 +417,5 @@ Reminders:
     Updated `Methodology.md` (step statuses, accuracy-vs-dense table, advantages, Gate A reading, H2 observation). Added
     `colab/start_after.sh` and started it: high_warm launches when low exits. The `resume_phaseA.sh` default now covers all four chains.
     Gate A (strict script): low PASS 3/3, warm03 2/2 (needs a 3rd), high FAIL (2 tiny wins). Runtime 6.21 h.
+  - **08:40 UTC:** user decision D12 (Gate A `high` = no *winning* tickets). `analysis/plots.py::gate_a` changed, and `gate_a.md` regenerated:
+    low PASS 3/3, high PASS 0/2 winning (2 positive-but-not-winning points listed), warm03 2/2, still needs a 3rd win.

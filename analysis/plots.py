@@ -229,20 +229,28 @@ def metrics_table(df: pd.DataFrame, conds: list[str]) -> None:
 
 
 def gate_a(adv: pd.DataFrame) -> None:
-    """Gate A: tickets beat trained baselines for low and warm03 at >= 3 sparsities, not for high."""
+    """Gate A: tickets beat trained baselines for low and warm03 at >= 3 sparsities, and high has no
+    *winning* ticket. For high a win uses the section-5 winning-ticket definition (the `winning` column:
+    advantage > 0 and ticket acc >= dense - 0.5 pp), not any positive advantage; decided by the user in
+    session 4, because high's tiny positive advantages (+0.36, +0.13 pp) came with tickets below dense."""
     lines = ["# Gate A (H1 replication)", ""]
     ok = True
     for cond, want in (("low", True), ("warm03", True), ("high", False)):
         a = adv[(adv.condition == cond) & (adv["round"] > 0) & adv.advantage.notna()]
-        wins = a[a.advantage > 0]
+        wins = a[a.advantage > 0] if want else a[a.winning.astype(bool)]
         n_win = len(wins)
         passed = (n_win >= 3) if want else (n_win == 0)
         ok &= passed and len(a) > 0
-        lines.append(f"- **{cond}**: ticket beats the best trained baseline at {n_win}/{len(a)} sparsities "
+        what = "ticket beats the best trained baseline" if want else "winning ticket (advantage > 0 and acc >= dense - 0.5 pp)"
+        lines.append(f"- **{cond}**: {what} at {n_win}/{len(a)} sparsities "
                      f"({', '.join(f'{100 * r:.1f}%' for r in wins.nominal_remaining)}); "
                      f"expected {'>= 3' if want else 'none'} -> {'PASS' if passed and len(a) else 'FAIL'}")
-    lines += ["", f"**Gate A: {'PASSED' if ok else 'NOT PASSED'}** (strict 'winning' verdicts are in "
-              "ticket_advantage.csv)", ""]
+        if not want:
+            pos = a[a.advantage > 0]
+            lines.append(f"  (positive advantage without a winning ticket at {len(pos)}/{len(a)}: "
+                         + ", ".join(f"{100 * r.nominal_remaining:.1f}% {100 * r.advantage:+.2f} pp, ticket "
+                                     f"{100 * (r.ticket_acc - r.dense_acc):+.2f} pp vs dense" for r in pos.itertuples()) + ")")
+    lines += ["", f"**Gate A: {'PASSED' if ok else 'NOT PASSED'}** (all verdicts are in ticket_advantage.csv)", ""]
     (RESULTS / "gate_a.md").write_text("\n".join(lines))
     print("\n".join(lines))
 
