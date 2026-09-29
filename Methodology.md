@@ -200,6 +200,7 @@ to 10k before any condition or seed is cut.
 | high | 0 | 2 | 49.1 | ticket | 89.21% | 0.659 | 0.240 | 0.235 | no |
 | warm03 | 0 | 0 | 100.0 | ticket (dense) | 87.48% | 0.000 | 0.083 | 0.558 | no |
 | warm03 | 0 | 1 | 70.1 | ticket | 88.22% | 0.000 | 0.051 | 0.496 | no |
+| warm03 | 0 | 2 | 49.1 | ticket | 88.57% | 0.000 | 0.045 | 0.447 | no |
 <!-- results-table:end -->
 
 **Observations so far (seed 0, single runs, directional only):**
