@@ -13,8 +13,14 @@ measured and what is still open. **Update it at the end of every work session.**
   same commands, and finished trainings were skipped. A new watcher (in the session scratchpad) **commits locally only; it does not push**.
   Push by hand with section 8, step 1. Remaining: low 10, high 14, warm03 14 trainings (~25 min each in parallel)
   → low done ≈ 09:30, high/warm03 ≈ 11:00 UTC, if the VM survives. Then `high_warm`.
-  **Budget alarm risk:** `compute_log.csv` books ~0.42 GPU-h per parallel training (inflated ~2.5x, see below). That would reach ~18 h
-  by the end of these three chains, so the built-in 30 h alarm could fire during Phase B even though real use is far lower.
+- **Budget redefined (session 4, user):** the budget is **30 h of Colab runtime (wall-clock usage), not GPU-hours**. At 05:10 UTC
+  on 2026-09-29, 27 h were left. `src/utils.py`: `RUNTIME_USED_BEFORE_H = 3.0` at `RUNTIME_SINCE`, plus the **union** of the
+  training intervals logged after that time, so parallel chains count once. Idle runtime (setup, analysis, gaps between runs) is not logged, so
+  this underestimates. **Re-calibrate both constants from the Colab usage page at each session start.** `LTH_BUDGET_H` is gone.
+  The laptop keeps its 18 GPU-h. The chains running now use the old code in memory; their `COST ESTIMATE` lines still show GPU-h.
+- **H2 metric changed (session 4, user-approved):** the H2 statistic is now **max S over steps 25–3,000** (`max_S_train`), with
+  **S(0)** reported separately (`src/metrics.py::stability_summary`, used by `analysis/plots.py` and `analysis/methodology_table.py`).
+  It is derived from the saved trajectories, so no re-run was needed; run JSONs keep the old `max_S_3k`. Listed as a deviation in `Methodology.md` section 9.
 - **Phase A started (session 3):** `resnet20_low` seed 0 is running (15 trainings, ~9.5 min each on the T4).
   Each finished training is committed and pushed as it lands, by a watcher script in the session's scratchpad (not in the repo).
   Before each commit it runs `python -m analysis.methodology_table`. One commit per result file, so `git log`
@@ -64,7 +70,7 @@ python -m src.imp configs/smoke.yaml
    from cs.toronto.edu is blocked/slow on Colab (O7):
    `!mkdir -p /content/cifar_raw && cp /content/drive/MyDrive/final_project/data/cifar-10-python.tar.gz /content/cifar_raw/`
    (`LTH_RAW_DATA=/content/cifar_raw` is set in cell 2). torchvision then finds the file, checks the MD5 and skips the download.
-4. On a T4 no `LTH_BUDGET_H` is needed (30 h built in). Run cells 1–3 (mount, env, tests); cells 4–5 (smoke,
+4. The budget (30 h of Colab runtime) is built in. Run cells 1–3 (mount, env, tests); cells 4–5 (smoke,
    benchmark) are already done for the T4 (section 6).
 4. Phase A/B cells follow. **Run one training cell at a time.**
 5. If the session dies: re-run cells 1–2, then the same command. Finished trainings are skipped.
@@ -99,8 +105,7 @@ python -m analysis.plots                                              # summary.
 - Paths are all relative to the project root (`pathlib`), so nothing needs editing on Linux.
 - Environment variables used by the code:
   - `LTH_RAW_DATA`: where the raw CIFAR-10 archive goes. Default `data/`.
-  - `LTH_BUDGET_H`: GPU-hour budget for GPUs other than the RTX 4060 (18 h) or T4 (30 h).
-    Without it there is a warning and no budget alarms.
+  - (`LTH_BUDGET_H` was removed in session 4: on Colab the budget is 30 h of runtime, see section 1.)
 
 ## 4. What exists
 
@@ -123,7 +128,7 @@ python -m analysis.plots                                              # summary.
 | `pilot_results/PILOT_FINDINGS.md` | session 2: pilot findings F1–F7 vs spec section 10 (2 seeds of the 4-epoch design: CPU + GPU re-run) |
 | `configs/` | smoke, resnet20_{low,high,warm03,high_warm}, conv4_fmnist_high, h4_high, h4_high_sam, h4_high_anchor |
 | `colab/run_on_colab.ipynb` | Colab runner (mount, env, tests, smoke, benchmark summary, Phase A/B cells) |
-| `tests/` | 21 tests (section 12 list plus schedules incl. the D11 schedule, NaN-mask guard, negative-dominant spectrum) |
+| `tests/` | 23 tests (section 12 list plus schedules incl. the D11 schedule, NaN-mask guard, negative-dominant spectrum) |
 | `data/cifar-10-python.tar.gz` | official archive on Drive (not in git), uploaded from the laptop in session 2 |
 | `results/smoke/seed0/` | T4 smoke run with the D11 schedule (6 trainings); benchmark reference |
 | `results/_archive/smoke_laptop_20260928_old_lambda/` | first smoke run, before the Lanczos fix; timing reference only |
@@ -232,7 +237,7 @@ Synthetic ResNet-20 training loop (fp16 + GradScaler, batch 128, 1,000 steps, no
   get it from the Drive zip or zalandoresearch/fashion-mnist), `research paper/` (third-party PDFs), `*.zip`.
   On Colab, `git clone` also works instead of the Drive zip, but then copy `pilot/data/*.gz` in by hand.
   Uploading `.git` with the Drive copy lets runs record the commit hash.
-- **O4. Budget for the G4. Moot while on a T4** (the built-in 30 T4-h budget applies). Only needed if runs move to a G4. Sections 4 and 9 only cover the RTX 4060 (18 h) and a T4 (30 h). Agree on a
+- **O4. Moot since session 4**: the budget is 30 h of Colab runtime on any GPU (section 1). Old text: **Budget for the G4. Moot while on a T4** (the built-in 30 T4-h budget applies). Only needed if runs move to a G4. Sections 4 and 9 only cover the RTX 4060 (18 h) and a T4 (30 h). Agree on a
   G4 budget (compute units), set `LTH_BUDGET_H`, and note it in the spec's section 9.
 - **O5.** Laptop throttling (section 6). Irrelevant on Colab, but fix it before using the laptop again.
 - **O7. cs.toronto.edu blocks this Colab IP (session 2).** The single-connection download ran at ~55 kB/s. A
@@ -337,3 +342,10 @@ Reminders:
     separately. **Proposal, needs approval** (it changes the H2 metric in `analysis/plots.py`; the raw trajectories are already
     saved, so no re-run is needed).
   - warm03 shows progressive sharpening during warmup (lambda_max 25 → 53 at step 2k) with S ≤ 0.08, the pattern Kalra & Barkeshli describe.
+- **2026-09-29, session 4 (Colab T4).**
+  - The VM had restarted: low r4, high r1 and warm03 r1 were lost, and every finished result was already committed. Relaunched
+    low/high/warm03 under MPS. New watcher (scratchpad) commits locally only; the GitHub token could not be read, so push by hand.
+  - User: the budget is 30 h of Colab runtime, not GPU-h, and 27 h are left → runtime accounting in `src/utils.py` / `src/imp.py`
+    (union of training intervals plus a calibrated offset), `LTH_BUDGET_H` removed (notebook too), test `tests/test_utils.py`.
+  - User approved the H2 fix → `stability_summary` (S0, max_S_train over steps 25–3k), fig. 3 (S(0) as hollow markers), fig. 5,
+    the Methodology table and the deviation list. Test in `tests/test_metrics.py`. 23 tests pass.

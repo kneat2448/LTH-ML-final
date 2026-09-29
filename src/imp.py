@@ -23,8 +23,9 @@ from src.data import Data, load_data
 from src.models import init_model
 from src.prune import Mask, density, global_magnitude_prune, ones_mask, output_name, remaining_fraction
 from src.train import Trainer, check_config, mode_of, nan_to_none
-from src.utils import (CHECKPOINTS, COMPUTE_LOG, RESULTS, Tee, append_compute_log, budget_hours,
-                       cumulative_gpu_hours, gpu_name, load_yaml, run_metadata, set_seed, timestamp)
+from src.utils import (CHECKPOINTS, COMPUTE_LOG, RESULTS, Tee, append_compute_log, budget_hours, budget_used,
+                       effective_minutes_per_training, gpu_name, is_laptop, load_yaml, run_metadata, set_seed,
+                       timestamp)
 
 # Section 9 assumption, used until results/compute_log.csv has measurements for this GPU.
 ASSUMED_MIN_PER_15K = {"4060": 6.0, "other": 10.0}
@@ -64,13 +65,19 @@ def minutes_per_training(cfg: dict) -> float:
 
 
 def announce_cost(cfg: dict, n_trainings: int) -> None:
-    """Estimate and log the cost before launching (CLAUDE.md section 0)."""
+    """Estimate and log the cost before launching (CLAUDE.md section 0). On Colab the budget is runtime
+    hours; the estimate uses the measured runtime per training, which already reflects parallel chains
+    (but assumes they keep running in parallel)."""
     gpu = gpu_name()
-    hours = n_trainings * minutes_per_training(cfg) / 60
-    used, budget = cumulative_gpu_hours(gpu), budget_hours(gpu)
-    print(f"COST ESTIMATE {cfg['name']}: {n_trainings} trainings x {minutes_per_training(cfg):.1f} min"
-          f" = {hours:.2f} GPU-h on {gpu}; used so far {used:.2f} / {budget} h", flush=True)
-    if budget is not None and used + hours > budget:
+    minutes = minutes_per_training(cfg)
+    if not is_laptop(gpu) and (eff := effective_minutes_per_training()):
+        minutes = eff * cfg["iters"] / 15000 * (2 if mode_of(cfg) == "sam" else 1)
+    hours = n_trainings * minutes / 60
+    used, budget = budget_used(gpu), budget_hours(gpu)
+    unit = "GPU-h" if is_laptop(gpu) else "h runtime"
+    print(f"COST ESTIMATE {cfg['name']}: {n_trainings} trainings x {minutes:.1f} min"
+          f" = {hours:.2f} {unit} on {gpu}; used so far {used:.2f} / {budget:.0f} h", flush=True)
+    if used + hours > budget:
         print("WARNING: this run would exceed the budget", flush=True)
 
 

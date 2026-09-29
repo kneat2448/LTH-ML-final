@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from src.metrics import stability_summary
 from src.utils import RESULTS
 
 FIG = RESULTS / "figures"
@@ -43,8 +44,8 @@ def build_summary() -> pd.DataFrame:
             "nominal_remaining": r["nominal_remaining"], "remaining": r["remaining"], "mode": r["mode"],
             "lr": r["config"]["lr"], "warmup_iters": r["config"]["warmup_iters"],
             "acc": t["acc"], "precision": t["precision"], "recall": t["recall"], "f1": t["f1"], "auc": t["auc"],
-            "val_acc": r["val_acc"], "R01": r["R01"], "R02": r["R02"], "max_S_3k": r["max_S_3k"],
-            "max_S": r["max_S"], "loss_spike": r["loss_spike"], "diverged": r["diverged"],
+            "val_acc": r["val_acc"], "R01": r["R01"], "R02": r["R02"], **stability_summary(r["sharpness"]),
+            "max_S_3k": r["max_S_3k"], "max_S": r["max_S"], "loss_spike": r["loss_spike"], "diverged": r["diverged"],
             "diverged_step": r["diverged_step"], "trained": r["trained"], "wall_s": r["wall_s"],
         })
     df = pd.DataFrame(rows)
@@ -140,21 +141,26 @@ def fig2_sharpness(records: list[dict], conds: list[str]) -> None:
 
 
 def fig3_max_s(df: pd.DataFrame, adv: pd.DataFrame, conds: list[str]) -> None:
-    """max_t S(t) over the first 3k steps vs % remaining; colour = sign of the ticket advantage."""
-    fig, axes = _panels(len(conds), "Fig. 3  max S(t), first 3k steps (H2)")
+    """H2: max S(t) over steps 25..3k (training-time sharpness) vs % remaining, colour = sign of the
+    ticket advantage. S at step 0 (sharpness at init) is drawn separately as hollow markers."""
+    fig, axes = _panels(len(conds), "Fig. 3  max S(t), steps 25–3k (H2)")
     for ax, cond in zip(axes, conds):
         tk = df[(df.condition == cond) & (df.variant == "ticket")]
-        g = tk.groupby("round").agg(rem=("nominal_remaining", "first"), s=("max_S_3k", "mean"))
+        g = tk.groupby("round").agg(rem=("nominal_remaining", "first"), s=("max_S_train", "mean"),
+                                    s0=("S0", "mean"))
         a = adv[adv.condition == cond].set_index("round").advantage
         colors = ["gray" if pd.isna(a.get(r)) else ("tab:green" if a[r] > 0 else "tab:red") for r in g.index]
         ax.plot(100 * g.rem, g.s, "-", color="lightgray")
         ax.scatter(100 * g.rem, g.s, c=colors, zorder=3)
+        ax.scatter(100 * g.rem, g.s0, facecolors="none", edgecolors="gray", marker="D", s=20, zorder=2)
         ax.axhline(1.0, color="k", ls="--", lw=1)
-        ax.set(xscale="log", title=cond, xlabel="% weights remaining", ylabel="max S (≤3k steps)")
+        ax.set(xscale="log", title=cond, xlabel="% weights remaining", ylabel="max S (steps 25–3k)")
+        ax.set_ylim(bottom=0)
         ax.invert_xaxis()
     axes[0].scatter([], [], c="tab:green", label="ticket advantage > 0")
     axes[0].scatter([], [], c="tab:red", label="≤ 0")
     axes[0].scatter([], [], c="gray", label="no trained baseline")
+    axes[0].scatter([], [], facecolors="none", edgecolors="gray", marker="D", s=20, label="S at step 0 (init)")
     axes[0].legend(fontsize=7)
     _save(fig, "fig3_max_s.png")
 
@@ -184,12 +190,12 @@ def fig5_h4(df: pd.DataFrame) -> None:
         tk = d[d.variant == "ticket"].groupby("round")
         sh = d[d.variant == "shuffle"].groupby("round").acc.mean()
         adv = (tk.acc.mean() - sh).reindex(H4_ROUNDS)
-        vals = [adv, tk.max_S_3k.mean().reindex(H4_ROUNDS), tk.R02.mean().reindex(H4_ROUNDS)]
+        vals = [adv, tk.max_S_train.mean().reindex(H4_ROUNDS), tk.R02.mean().reindex(H4_ROUNDS)]
         x = np.arange(len(H4_ROUNDS)) + i * width
         for ax, v in zip(axes, vals):
             ax.bar(x, v.values, width, label=cond)
     labels = [f"{100 * 0.7 ** r:.1f}%" for r in H4_ROUNDS]
-    for ax, yl in zip(axes, ["ticket − shuffle acc", "max S (≤3k)", "R_0.2"]):
+    for ax, yl in zip(axes, ["ticket − shuffle acc", "max S (steps 25–3k)", "R_0.2"]):
         ax.set_xticks(np.arange(len(H4_ROUNDS)) + 0.4 - width / 2, labels)
         ax.set(ylabel=yl, xlabel="weights remaining")
     axes[1].axhline(1.0, color="k", ls="--", lw=1)

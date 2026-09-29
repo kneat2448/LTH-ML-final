@@ -99,3 +99,20 @@ def loss_spike(early_losses: list[float]) -> float:
     if not all(math.isfinite(v) for v in window):
         return float("inf")  # the loss blew up inside the window
     return max(window) / early_losses[0]
+
+
+S_TRAIN_FROM = 25  # H2: training-time sharpness starts at the first step after init
+S_TRAIN_TO = 3000
+
+
+def stability_summary(traj: list[dict]) -> dict:
+    """H2 statistics of a saved sharpness trajectory ([{"step", "S", ...}]).
+
+    S0 = S at step 0, i.e. sharpness at initialization before any update, reported on its own.
+    max_S_train = max S over steps 25..3000. Without warmup S(0) dominates the old max_S_3k
+    (0.67 for dense `high`, where lambda_max drops 4x within 25 steps), which measures init, not training.
+    Missing values (None/NaN after a divergence) are skipped."""
+    ok = [r for r in traj if r.get("S") is not None and not math.isnan(r["S"])]
+    s0 = next((r["S"] for r in ok if r["step"] == 0), float("nan"))
+    train = [r["S"] for r in ok if S_TRAIN_FROM <= r["step"] <= S_TRAIN_TO]
+    return {"S0": s0, "max_S_train": max(train, default=float("nan"))}

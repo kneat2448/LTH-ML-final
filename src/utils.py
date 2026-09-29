@@ -19,8 +19,16 @@ RESULTS = ROOT / "results"
 CHECKPOINTS = ROOT / "checkpoints"
 COMPUTE_LOG = RESULTS / "compute_log.csv"
 
-# GPU-hour budget per machine (CLAUDE.md section 9).
-BUDGET_GPU_H = {"4060": 18.0, "T4": 30.0}
+# Laptop budget (CLAUDE.md section 9), in GPU-hours on the RTX 4060.
+BUDGET_GPU_H = {"4060": 18.0}
+# Colab budget: 30 h of runtime (wall-clock usage, whatever the GPU), not GPU-hours. Parallel chains
+# under MPS share the same runtime, so usage is the union of the training intervals, not their sum.
+RUNTIME_BUDGET_H = 30.0
+# Runtime already used before RUNTIME_SINCE (stated by the user in session 4; 27 h were left).
+# Only trainings that end after RUNTIME_SINCE are added on top. Re-calibrate both from the Colab
+# usage page when they drift: idle runtime (setup, analysis, gaps between runs) is not logged.
+RUNTIME_USED_BEFORE_H = 3.0
+RUNTIME_SINCE = "2026-09-29T05:10:00"
 
 
 def set_seed(seed: int) -> None:
@@ -88,28 +96,75 @@ class Tee:
         self.file.flush()
 
 
-def budget_hours(gpu: str) -> float | None:
-    """GPU-hour budget of the machine in use (section 9): 18 h on the RTX 4060, 30 h on a T4.
-    Any other GPU (e.g. a Colab G4) needs the budget in the env var LTH_BUDGET_H."""
+def is_laptop(gpu: str) -> bool:
+    return any(key in gpu for key in BUDGET_GPU_H)
+
+
+def budget_hours(gpu: str) -> float:
+    """Budget of the machine in use: 18 GPU-h on the RTX 4060 (section 9), else 30 h of Colab runtime."""
     for key, hours in BUDGET_GPU_H.items():
         if key in gpu:
             return hours
-    if os.environ.get("LTH_BUDGET_H"):
-        return float(os.environ["LTH_BUDGET_H"])
-    print(f"WARNING: no GPU-hour budget known for {gpu}; set LTH_BUDGET_H (see NOTES.md)")
-    return None
+    return RUNTIME_BUDGET_H
+
+
+def _compute_rows(gpu: str | None = None) -> list[dict]:
+    if not COMPUTE_LOG.exists():
+        return []
+    with open(COMPUTE_LOG, newline="", encoding="utf-8") as f:
+        return [r for r in csv.DictReader(f) if gpu is None or r["gpu"] == gpu]
 
 
 def cumulative_gpu_hours(gpu: str) -> float:
-    """Sum of logged GPU time on this exact GPU model."""
-    if not COMPUTE_LOG.exists():
-        return 0.0
-    with open(COMPUTE_LOG, newline="", encoding="utf-8") as f:
-        return sum(float(r["wall_s"]) / 3600 for r in csv.DictReader(f) if r["gpu"] == gpu)
+    """Sum of logged GPU time on this exact GPU model (inflated for parallel runs)."""
+    return sum(float(r["wall_s"]) / 3600 for r in _compute_rows(gpu))
+
+
+def _colab_intervals() -> list[tuple[dt.datetime, dt.datetime]]:
+    """[start, end] of each non-laptop training that ended after RUNTIME_SINCE, sorted.
+    The log's `time` is written when a training finishes, so it is the end of the interval."""
+    since = dt.datetime.fromisoformat(RUNTIME_SINCE)
+    out = []
+    for r in _compute_rows():
+        end = dt.datetime.fromisoformat(r["time"])
+        if not is_laptop(r["gpu"]) and end > since:
+            out.append((max(end - dt.timedelta(seconds=float(r["wall_s"])), since), end))
+    return sorted(out)
+
+
+def union_hours(intervals: list[tuple[dt.datetime, dt.datetime]]) -> float:
+    """Total length of the union of sorted intervals, in hours."""
+    total, cur_s, cur_e = 0.0, None, None
+    for s, e in intervals:
+        if cur_e is None or s > cur_e:
+            if cur_e is not None:
+                total += (cur_e - cur_s).total_seconds()
+            cur_s, cur_e = s, e
+        else:
+            cur_e = max(cur_e, e)
+    if cur_e is not None:
+        total += (cur_e - cur_s).total_seconds()
+    return total / 3600
+
+
+def runtime_hours_used() -> float:
+    """Colab runtime used: the calibrated amount before RUNTIME_SINCE plus the union of later trainings."""
+    return RUNTIME_USED_BEFORE_H + union_hours(_colab_intervals())
+
+
+def effective_minutes_per_training() -> float | None:
+    """Runtime per finished training since RUNTIME_SINCE (accounts for parallel chains), if any."""
+    iv = _colab_intervals()
+    return 60 * union_hours(iv) / len(iv) if iv else None
+
+
+def budget_used(gpu: str) -> float:
+    """GPU-h on the laptop, runtime hours on Colab (same units as budget_hours)."""
+    return cumulative_gpu_hours(gpu) if is_laptop(gpu) else runtime_hours_used()
 
 
 def append_compute_log(row: dict) -> None:
-    """Append one training to results/compute_log.csv and warn at 80% / 95% of budget."""
+    """Append one training to results/compute_log.csv and warn at 80% / 95% of the budget."""
     COMPUTE_LOG.parent.mkdir(parents=True, exist_ok=True)
     new = not COMPUTE_LOG.exists()
     with open(COMPUTE_LOG, "a", newline="", encoding="utf-8") as f:
@@ -117,10 +172,8 @@ def append_compute_log(row: dict) -> None:
         if new:
             w.writeheader()
         w.writerow(row)
-    used, budget = cumulative_gpu_hours(row["gpu"]), budget_hours(row["gpu"])
-    if budget is None:
-        return
+    used, budget = budget_used(row["gpu"]), budget_hours(row["gpu"])
     for frac in (0.95, 0.80):
         if used >= frac * budget:
-            print(f"WARNING: {used:.2f} GPU-h used, past {frac:.0%} of the {budget:.0f} h budget")
+            print(f"WARNING: {used:.2f} h used, past {frac:.0%} of the {budget:.0f} h budget")
             break

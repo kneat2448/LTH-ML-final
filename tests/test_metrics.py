@@ -1,8 +1,9 @@
+import math
 import numpy as np
 import torch
 from sklearn.metrics import accuracy_score, confusion_matrix, precision_recall_fscore_support, roc_auc_score
 
-from src.metrics import classification_metrics, overlap_ratio
+from src.metrics import classification_metrics, overlap_ratio, stability_summary
 
 
 def test_metrics_match_sklearn():
@@ -36,3 +37,12 @@ def test_overlap_ratio_extremes():
     assert overlap_ratio(w0, w0, mask, 0.2) == 1.0
     rand = [overlap_ratio(w0, {"w": torch.randn(1000)}, mask, 0.2) for _ in range(20)]
     assert abs(np.mean(rand) - 0.2) < 0.03  # chance level R_p ~ p
+
+
+def test_stability_summary_excludes_step0():
+    traj = [{"step": 0, "S": 0.67}, {"step": 25, "S": 0.16}, {"step": 500, "S": 0.23},
+            {"step": 3000, "S": None}, {"step": 6000, "S": 0.9}]
+    out = stability_summary(traj)
+    assert out["S0"] == 0.67
+    assert out["max_S_train"] == 0.23  # step 0 and steps > 3k excluded, None skipped
+    assert math.isnan(stability_summary([])["S0"])

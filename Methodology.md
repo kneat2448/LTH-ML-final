@@ -27,7 +27,7 @@ sharpness lambda_max so that a large learning rate becomes stable. We ask:
 | | Hypothesis | Tested by |
 |---|---|---|
 | **H1** | Replication: tickets beat trained baselines at eta = 0.01 and with warmup (eta = 0.03), but not at eta = 0.1 without warmup | Phase A, Gate A |
-| **H2** | Where tickets fail, the stability ratio S(t) reaches ~1 in early training. Where they win, S stays clearly below 1. Sharpness at init alone does not predict this | max S(t ≤ 3k) vs ticket advantage (fig. 3) |
+| **H2** | Where tickets fail, the stability ratio S(t) reaches ~1 in early training. Where they win, S stays clearly below 1. Sharpness at init alone does not predict this | max S(t) over steps 25–3k vs ticket advantage (fig. 3); S(0) reported separately |
 | **H3** | Warmup keeps S below 1 during the high-LR phase, and this coincides with the return of the ticket advantage | `warm03` / `high_warm` vs `high` trajectories (fig. 2) |
 | **H4** | Causal test with masks held fixed: warm03 masks trained at eta = 0.1 (a) plain, (b) with SAM (lowers sharpness), (c) with an L2 anchor to theta_0 (raises R_p without lowering sharpness) | Phase B, fig. 5 |
 
@@ -109,8 +109,9 @@ Schedule (D11): steps 0, 25, 50, 100, 200, every 500 up to 3,000, then every 3,0
 (15 points).
 
 **Stability ratio.** S(t) = eta_t · lambda_max(t) / (2 + 2·beta) = eta_t · lambda_max(t) / 3.8.
-S = 1 is the edge of stability for SGD with heavy-ball momentum. We record the trajectory and
-**max S over the first 3k steps**.
+S = 1 is the edge of stability for SGD with heavy-ball momentum. We record the trajectory. The H2 statistic is
+**max S over steps 25–3,000** (training-time sharpness). **S(0)**, sharpness at initialization before any
+update, is reported separately (see section 9).
 
 **Weight correlation.** R_p (Liu et al. 2021, Eq. 1): the share of the top-p surviving weights by
 |theta_0| that are also in the top-p by |theta_T|. It is computed per layer and pooled, for p ∈ {0.1, 0.2}.
@@ -148,14 +149,15 @@ collapse rather than a systematic ticket deficit (F1, F2).
 | 7 | Analysis: `python -m analysis.plots` → summary.csv, figs 1–5, metrics table, gate_a.md | script ready |
 | 8 | `results/FINDINGS.md`: verdict + numbers for H1–H4; final report | pending |
 
-**Compute (T4, D11 schedule):** Phase A ≈ 9 GPU-h and Phase B ≈ 10 GPU-h, out of a 30 T4-h budget.
-Every run's GPU time goes to `results/compute_log.csv`. If trainings take longer than 12 min, `iters` is cut
+**Compute (T4, D11 schedule):** Phase A ≈ 9 GPU-h and Phase B ≈ 10 GPU-h of training. The budget is **30 h of Colab
+runtime** (wall-clock usage, not GPU-hours; 27 h were left at the start of session 4). Every training goes to
+`results/compute_log.csv`. Runtime used is counted as the union of training intervals, because parallel chains share the runtime. If trainings take longer than 12 min, `iters` is cut
 to 10k before any condition or seed is cut.
 
 **Analysis outputs** (all regenerate from `results/` with `python -m analysis.plots`):
 1. Test accuracy vs % remaining: ticket vs baselines, one panel per condition, dense line (H1).
 2. lambda_max(t) with the (2 + 2·beta)/eta_t limit at 100%, 34% and 5.8% remaining (H2, H3).
-3. max S(t ≤ 3k) vs % remaining, with the sign of the ticket advantage (H2).
+3. max S(t) over steps 25–3k vs % remaining, with the sign of the ticket advantage, and S(0) as hollow markers (H2).
 4. R_p vs % remaining per condition (weight correlation).
 5. H4 bars: ticket advantage, max S and R_0.2 for high / high_sam / high_anchor / warm03.
 6. A metrics table (acc, P, R, F1, AUC) for dense and for the tickets at 34% and 5.8%.
@@ -171,6 +173,11 @@ to 10k before any condition or seed is cut.
 - **fp16 + GradScaler on the T4 (D2).** The spec assumed bf16 on the RTX 4060.
 - **Hessian in NCHW (D3)**, for speed. Training stays channels_last.
 - **Divergence threshold (D4):** validation accuracy < 0.15. The anchor and R_p use each run's own init (D5).
+- **H2 statistic excludes step 0.** The spec's max S(t ≤ 3k) is replaced by max S over steps 25–3,000, and S(0) is reported
+  on its own. Without warmup, S(0) = eta · lambda_max(theta_0 ⊙ m) sets the old maximum (0.67 for dense `high`, while
+  lambda_max drops from 25.5 to 6.2 within 25 steps). That is sharpness at init, which H2 says should *not* predict failure.
+  Only the analysis changed; the raw trajectories were already saved, so no run was repeated. The run JSONs still
+  contain the old `max_S_3k` field.
 - **Pilot re-interpretation:** P1 is reversed (dense eta = 0.1 collapses in 2 of 3 short runs), P3 is weakened
   (seed-dependent), and P2 is unverified (likely the D1 artifact). See `pilot_results/PILOT_FINDINGS.md`.
 
@@ -179,15 +186,15 @@ to 10k before any condition or seed is cut.
 *The table is regenerated from `results/` by `python -m analysis.methodology_table` after every finished training.*
 
 <!-- results-table:start -->
-| Condition | Seed | Round | % remaining | Variant | Test acc | max S(≤3k) | R_0.2 | Diverged |
-|---|---|---|---|---|---|---|---|---|
-| low | 0 | 0 | 100.0 | ticket (dense) | 86.66% | 0.081 | 0.640 | no |
-| low | 0 | 1 | 70.1 | ticket | 87.43% | 0.148 | 0.584 | no |
-| low | 0 | 2 | 49.1 | reinit | 85.78% | 0.084 | 0.550 | no |
-| low | 0 | 2 | 49.1 | ticket | 87.85% | 0.085 | 0.525 | no |
-| low | 0 | 3 | 34.5 | ticket | 87.87% | 0.087 | 0.465 | no |
-| high | 0 | 0 | 100.0 | ticket (dense) | 89.83% | 0.670 | 0.247 | no |
-| warm03 | 0 | 0 | 100.0 | ticket (dense) | 87.48% | 0.083 | 0.558 | no |
+| Condition | Seed | Round | % remaining | Variant | Test acc | S(0) | max S(25–3k) | R_0.2 | Diverged |
+|---|---|---|---|---|---|---|---|---|---|
+| low | 0 | 0 | 100.0 | ticket (dense) | 86.66% | 0.067 | 0.081 | 0.640 | no |
+| low | 0 | 1 | 70.1 | ticket | 87.43% | 0.083 | 0.148 | 0.584 | no |
+| low | 0 | 2 | 49.1 | reinit | 85.78% | 0.084 | 0.075 | 0.550 | no |
+| low | 0 | 2 | 49.1 | ticket | 87.85% | 0.053 | 0.085 | 0.525 | no |
+| low | 0 | 3 | 34.5 | ticket | 87.87% | 0.046 | 0.087 | 0.465 | no |
+| high | 0 | 0 | 100.0 | ticket (dense) | 89.83% | 0.670 | 0.226 | 0.247 | no |
+| warm03 | 0 | 0 | 100.0 | ticket (dense) | 87.48% | 0.000 | 0.083 | 0.558 | no |
 <!-- results-table:end -->
 
 **Observations so far (seed 0, single runs, directional only):**
@@ -202,7 +209,7 @@ to 10k before any condition or seed is cut.
 - **Methodological issue in max S(≤3k).** For runs without warmup, the maximum is set by **step 0**, where S = eta · lambda_max(theta_0 ⊙ m)
   is sharpness at initialization, before any update (0.67 for `high`). H2 is about *training-time* sharpness and
   expects sharpness at init *not* to predict failure. The H2 analysis should therefore use max S over steps 25–3,000
-  (the `high` dense value is 0.226), and report step 0 separately. *Proposal; not yet implemented in `analysis/plots.py`.*
+  (the `high` dense value is 0.226), and report step 0 separately. *Adopted in session 4 (section 9); the table above and fig. 3 use it.*
 - **Weight correlation.** Dense R_0.2 is 0.64 (low), 0.56 (warm03) and 0.25 (high; chance is 0.2), which agrees with Liu et al. A large LR
   decorrelates theta_T from theta_0, and warmup keeps part of the correlation.
 - **Ticket advantage (low):** +2.07 pp over reinit at 49.1% remaining. Tickets stay at or above dense accuracy down to 34.5% (87.87%).
