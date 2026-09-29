@@ -1,0 +1,10 @@
+condition,round,nominal_remaining,dense_acc,ticket_acc,best_baseline_acc,advantage,advantage_se,n_seeds,untrained_baselines,winning
+high,0,1.0,0.8983,0.8983,,,,0,0,False
+low,0,1.0,0.8666,0.8666,,,,0,0,False
+low,1,0.7,0.8666,0.8743,,,,0,0,False
+low,2,0.48999999999999994,0.8666,0.8785,0.8578,0.02069999999999994,,1,0,True
+low,3,0.3429999999999999,0.8666,0.8787,,,,0,0,False
+smoke,0,1.0,0.4227,0.4227,,,,0,0,False
+smoke,1,0.7,0.4227,0.4654,0.4898,-0.024400000000000033,,1,0,False
+smoke,2,0.48999999999999994,0.4227,0.5131,0.5461,-0.03300000000000003,,1,0,False
+warm03,0,1.0,0.8748,0.8748,,,,0,0,False

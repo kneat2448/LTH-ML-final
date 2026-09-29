@@ -12,3 +12,5 @@ COST ESTIMATE low: 11 trainings x 9.3 min = 1.70 GPU-h on Tesla T4; used so far 
 [low seed0 r3 ticket] mode=plain remaining=0.3447
    acc=0.8787 f1=0.8786 R02=0.465 maxS3k=0.087 diverged=False wall=25.0min sharp_overhead=144.6% peakVRAM=2459MB
 [low seed0 r4 ticket] mode=plain remaining=0.2420
+COST ESTIMATE low: 10 trainings x 15.9 min = 2.65 GPU-h on Tesla T4; used so far 2.08 / 30.0 h
+[low seed0 r4 ticket] mode=plain remaining=0.2420
