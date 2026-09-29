@@ -1,0 +1,2 @@
+COST ESTIMATE high_warm: 15 trainings x 8.0 min = 2.01 h runtime on Tesla T4; used so far 6.89 / 30 h
+[high_warm seed0 r0 ticket] mode=warmup remaining=1.0000
