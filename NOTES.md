@@ -384,3 +384,8 @@ Reminders:
   - **07:30 UTC:** the user asked to save progress every 15 min so a runtime error loses nothing. The watcher moved from the scratchpad into
     the repo (`colab/watcher.sh`) with a 15-min autosave and push retries. Added `colab/resume_phaseA.sh`. high r4 reinit landed at 07:25
     (reported with the next batch).
+  - **07:37 UTC batch (reinit baselines):** low r6 reinit 83.05% vs ticket 87.59% → **+4.54 pp at 12.0%** (low: +2.07 → +3.28 → +4.54,
+    growing with sparsity). **warm03 r4 reinit 85.24% vs ticket 89.11% → +3.87 pp at 24.2%**. **high r4 reinit 87.15% vs ticket 87.28%
+    → +0.13 pp**: tiny, but the second small positive high point (r2 +0.36), so the strict Gate A 'high: no wins' criterion keeps
+    failing even though the high advantage is an order of magnitude smaller than low/warm03. The r4 shuffles (high, warm03) are still to come.
+    Runtime 5.42 h.
