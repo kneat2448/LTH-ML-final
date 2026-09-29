@@ -8,22 +8,26 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ## 1. Current status (2026-09-29, session 4, Colab T4)
 
-- **Now (08:25 UTC): Phase A 31/60 trainings done (52%); whole study ≈ 31/123 (25%).**
-  | Chain | Done | Left | Expected finish (UTC) |
-  |---|---|---|---|
-  | low | 13/15 | r8 reinit, r8 shuffle | ≈ 09:05 |
-  | high | 9/15 | r6 ticket (running), r6 reinit, r7, r8 ticket + reinit + shuffle | ≈ 10:30 |
-  | warm03 | 9/15 | same as high | ≈ 10:45 |
-  | high_warm | 0/15 | all; **starts automatically when low finishes** (`colab/start_after.sh`, log `/content/start_after.out`) | ≈ 12:30 |
-  Rate since the 05:10 relaunch: 24 trainings in 3.2 h = **7.4 trainings/h** with 3 chains (23 min wall each, ~8 min effective).
-  high_warm runs alone after ~10:45 (~9.3 min per training).
-  **Forecast:** Phase A done ≈ 12:30 UTC today, at ≈ 10.5 h runtime used of 30 (≈ 6.2 h now). Gate A can be read then. Phase B
-  (seed 1 of low/high/warm03 = 45 trainings, plus H4 ≈ 18 trainings incl. SAM) ≈ 9 h more with 3 chains → total ≈ 20 h of 30,
-  leaving ≈ 10 h reserve, minus idle time that is not logged. If the VM restarts, each chain loses ≤ 25 min.
-- **Findings so far:** see `Methodology.md` section 10 (accuracy-vs-dense table, ticket advantages, Gate A reading, H2 sharpness).
-  Short version: low and warm03 tickets win (up to +4.5 / +3.9 pp over reinit); high tickets fall below dense as sparsity grows
-  (−3.7 pp at 17%). No run reaches S ≈ 1, including the failing high tickets. **Gate A for high uses the winning-ticket definition (D12)** →
-  high PASS (0 winning tickets). Gate A now: low PASS, high PASS, warm03 2/2 (its r6 or r8 baseline decides it).
+- **END OF SESSION 4 (09:13 UTC, user shut the runtime down). Phase A 37/60 trainings done (62%); whole study ≈ 37/123 (30%).**
+  | Chain | Done | Left |
+  |---|---|---|
+  | low | **15/15, complete** | — |
+  | high | 11/15 | r7 ticket, r8 ticket + reinit + shuffle |
+  | warm03 | 11/15 | r7 ticket, r8 ticket + reinit + shuffle |
+  | high_warm | 0/15 | all (it had just started r0 at 09:04; that run is lost) |
+  The trainings in progress at shutdown (high r7, warm03 r7, high_warm r0) are lost; they restart from scratch on resume.
+  **Gate A (seed 0): PASSED**: low 4/4, warm03 3/3, high 0/3 winning tickets (D12). high/warm03 r8 and high_warm are still to add.
+- **NEXT SESSION, step by step:**
+  1. Mount Drive, `cd /content/drive/MyDrive/final_project`, check `git status` / `git log -1` (everything was pushed; HEAD = the
+     "Session 4 end" commit).
+  2. **Re-calibrate the budget:** read the remaining Colab hours from the usage page. In `src/utils.py`, set `RUNTIME_USED_BEFORE_H = 30 − remaining`
+     and `RUNTIME_SINCE` = now (UTC, ISO format). Commit. (Logged at shutdown: 7.0 h, plus unlogged idle time.)
+  3. `bash colab/resume_phaseA.sh`: copies CIFAR, starts MPS, and launches high, warm03 and high_warm (low exits at once: all done) + the watcher
+     (commits and pushes each result, 15-min autosave).
+  4. **Forecast:** 23 trainings left. high/warm03 ≈ 1.6 h in parallel; high_warm ≈ 4 trainings alongside them, then 11 alone at ~9 min →
+     **Phase A done ≈ 3.3 h after the resume**. Then `python -m analysis.plots`, read `results/gate_a.md`, and write up Phase A.
+  5. Phase B (Gate A passed): `--seeds 1` for low/high/warm03 (45 trainings, 3 chains under MPS ≈ 6 h), then H4 (`--select-lam`
+     first; ≈ 18 trainings incl. SAM ≈ 3 h). **Total study ≈ 7 + 3.3 + 9 ≈ 19–20 h of the 30 h runtime budget.**
 - **After a VM restart, run `bash colab/resume_phaseA.sh`** (copies CIFAR, starts MPS, relaunches any chain that is not running,
   starts the watcher). Finished trainings are skipped; only the training in progress is lost (~25 min per chain).
 - **Watcher, now in the repo (`colab/watcher.sh`):** commits and pushes each finished result, and **every 15 min autosaves**
@@ -428,3 +432,8 @@ Reminders:
     winning ticket** (D12). high is now 0/3 winning, with 3 tiny positive advantages (+0.36, +0.13, +0.39). **warm03 r6 (12.0%) ticket 88.65%
     (+1.17 pp vs dense)**, max S 0.036. The warm03 r6 reinit (running) will likely give warm03's 3rd Gate A win. low r8 shuffle is still running
     (low's last training); high_warm not yet started. Runtime 6.70 h.
+  - **09:13 UTC, session end (user shut the runtime down):** low r8 shuffle 78.30%, so **low is complete** (advantage +6.00 pp at 6.0%;
+    4/4 Gate A wins). **warm03 r6 reinit 83.76% vs ticket 88.65% → +4.89 pp at 12.0%**, its 3rd win → **Gate A PASSED on seed 0**
+    (low 4/4, warm03 3/3, high 0/3 winning). high_warm started automatically at 09:04 (`start_after.sh`); its r0 was lost at shutdown,
+    as were high r7 and warm03 r7. The watcher was stopped before the final commit. Everything, including analysis outputs, is committed and pushed.
+    Logged runtime 7.0 h (plus unlogged idle time).
