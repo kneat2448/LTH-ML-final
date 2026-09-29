@@ -289,7 +289,11 @@ Reminders:
     lambda_max 25.5 at init, peak 30.9 at step 25, then down to ~8 by step 6k and 8.6 at the end. S = eta*lambda/(2(1+beta))
     peaks at 0.081 (step 25): the low-LR run stays far from the stability edge (S = 1), as H1 assumes. R_0.2 ends at 0.640.
   - **low r1 (70.1%):** test acc **87.43%** (+0.77 pp over dense), max S(3k) **0.148** (about 1.8x dense at the same eta),
-    R_0.2 0.584. First sign that the stability ratio rises with sparsity at a fixed LR, which is the direction H2 needs.
-    It is still far below 1.
+    R_0.2 0.584. (First read as "S rises with sparsity"; **retracted after r2**: the 0.148 is one point at step 500,
+    and the rest of r1's trajectory is 0.04–0.08.)
   - Added `Methodology.md` (method as run, deviations, study steps and status, results table) and
     `analysis/methodology_table.py`, which regenerates that table after every finished training.
+  - **low r2 (49.1%):** test acc **87.85%** (+1.19 pp over dense), max S(3k) 0.085, loss spike 1.0 (no early spike in r0–r2).
+    At eta = 0.01, S stays in 0.03–0.09 at every sparsity so far, apart from single-point jumps. max S over one
+    trajectory is **sensitive to single-point noise**, so fig. 3 should also show a robust statistic
+    (e.g. the median of the early points). This is a proposal, not implemented.
