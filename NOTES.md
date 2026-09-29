@@ -391,3 +391,6 @@ Reminders:
     Runtime 5.42 h.
   - **07:53 UTC check:** high r4 shuffle 87.11% (07:47), so the high advantage at 24.2% stays +0.13 pp (best baseline = reinit 87.15%). The first 15-min autosave ran at 07:47 and pushed. Running: low r7 ticket (8.4%),
     high r5 ticket (17.0%), warm03 r4 shuffle. Runtime 5.59 h.
+  - **08:08 UTC check:** low r7 (8.4%) ticket 87.17% (+0.51 pp vs dense, slowly falling toward dense). **high r5 (17.0%) ticket 86.13%:
+    −3.70 pp vs dense** (the gap keeps widening), max S(25–3k) 0.248. warm03 r4 shuffle 84.53%, so the warm03 advantage at 24.2% stays +3.87 pp
+    (best baseline = reinit). Running: low r8 ticket (5.97%, the last low round), warm03 r5 ticket, the next high training. Runtime 5.96 h.
