@@ -207,8 +207,11 @@ python -m analysis.plots                                              # summary.
 
 ## 8. Handoff: what to do next (in order)
 
-1. **Push the unpushed commits** (run it yourself in a Colab cell, with a fresh token; revoke the one pasted in chat in session 2):
-   `!git -C /content/drive/MyDrive/final_project push https://<TOKEN>@github.com/kneat2448/LTH-ML-final.git main`
+1. **Push the unpushed commits.** The token lives in `/content/drive/MyDrive/.secrets/github_token` (on Drive,
+   **outside the repo**, so it is never committed; never write the token itself into this file, because NOTES.md is pushed
+   and GitHub would revoke it). Create it once from a Colab cell:
+   `!mkdir -p /content/drive/MyDrive/.secrets && echo '<TOKEN>' > /content/drive/MyDrive/.secrets/github_token && chmod 600 /content/drive/MyDrive/.secrets/github_token`
+   then push: `!git -C /content/drive/MyDrive/final_project push https://$(cat /content/drive/MyDrive/.secrets/github_token)@github.com/kneat2448/LTH-ML-final.git main`
 2. **Session start on Colab (T4):** mount Drive, `cd /content/drive/MyDrive/final_project`,
    `mkdir -p /content/cifar_raw && cp data/cifar-10-python.tar.gz /content/cifar_raw/`, `export LTH_RAW_DATA=/content/cifar_raw`.
 3. ~~Smoke run~~: done on the T4 (section 6).
