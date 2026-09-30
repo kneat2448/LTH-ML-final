@@ -498,3 +498,10 @@ Reminders:
       high s1 S(0) 0.53 / 0.87 on the sparse masks, no divergence, no spikes.
     - `colab/watcher.sh`: commit messages now say `Phase B (seed1)` for seed-1 results (the ones before 07:30 say "Phase A"). Watcher restarted
       (a `pkill -f colab/watcher.sh` also killed the calling shell; use `pkill -f "^bash colab/watcher.sh"`).
+  - **09:28 UTC: VM reset (≈ 09:16) found and recovered.** Nothing was running; the last watcher commit was 08:14 + the high s1 r3 ticket.
+    Lost in progress: high_warm r6 ticket, low s1 r4 ticket, high s1 r4 ticket. The uncommitted low s1 r3 ticket (88.12%, +1.64 pp vs its dense 86.48%;
+    seed 0 r3 gap for comparison in `summary.csv`) was committed by hand. Relaunched with `bash colab/resume_phaseA.sh high_warm`,
+    `bash colab/resume_phaseB.sh low high`, and a waiting `WAIT_FOR=high_warm … resume_phaseB.sh warm03` (the plain `resume_phaseB.sh` would start
+    warm03 as a 4th chain). GPU 100%, watcher running. Status: Phase A 54/60 (high_warm 6 left), seed 1 10/45 (low 5, high 5; warm03 0).
+    Logged runtime 13.41 h, **excluding the idle time around the reset, so re-calibrate from the Colab usage page.**
+    Forecast: 41 trainings left at ≈ 6.5/h → seed 1 done ≈ 16:00 UTC (≈ 20 h logged), then H4 ≈ 3 h.
