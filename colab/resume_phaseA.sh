@@ -6,6 +6,8 @@ cd /content/drive/MyDrive/final_project
 CONDS=${@:-low high warm03 high_warm}   # finished chains exit at once (all trainings skipped)
 mkdir -p /content/cifar_raw
 [ -f /content/cifar_raw/cifar-10-python.tar.gz ] || cp data/cifar-10-python.tar.gz /content/cifar_raw/
+# extract once here: chains started together would each extract it and race (session 5: one read a half-written batch)
+[ -d /content/cifar_raw/cifar-10-batches-py ] || tar -xzf /content/cifar_raw/cifar-10-python.tar.gz -C /content/cifar_raw
 export LTH_RAW_DATA=/content/cifar_raw CUDA_MPS_PIPE_DIRECTORY=/tmp/mps_pipe CUDA_MPS_LOG_DIRECTORY=/tmp/mps_log
 mkdir -p $CUDA_MPS_PIPE_DIRECTORY $CUDA_MPS_LOG_DIRECTORY
 pgrep -f nvidia-cuda-mps-control >/dev/null || nvidia-cuda-mps-control -d

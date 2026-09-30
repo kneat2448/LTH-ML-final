@@ -8,6 +8,9 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ## 1. Current status (2026-09-29, session 4, Colab T4)
 
+- **SESSION 5 (2026-09-30, from 04:38 UTC): Phase A resumed.** high r7 had finished after all (38/60 done). high, warm03 and high_warm
+  run under MPS with the watcher. See the section 9 log for progress. The session-4 notes below are kept for reference.
+
 - **END OF SESSION 4 (09:13 UTC, user shut the runtime down). Phase A 37/60 trainings done (62%); whole study ≈ 37/123 (30%).**
   | Chain | Done | Left |
   |---|---|---|
@@ -437,3 +440,12 @@ Reminders:
     (low 4/4, warm03 3/3, high 0/3 winning). high_warm started automatically at 09:04 (`start_after.sh`); its r0 was lost at shutdown,
     as were high r7 and warm03 r7. The watcher was stopped before the final commit. Everything, including analysis outputs, is committed and pushed.
     Logged runtime 7.0 h (plus unlogged idle time).
+- **2026-09-30, session 5 (Colab T4).**
+  - **04:38 UTC:** The high r7 ticket had finished at 09:14 on 09-29, after the handoff was written (it was listed as lost): **high r7 (8.4%) 84.25%,
+    −5.58 pp vs dense**, max S(25–3k) 0.177, S(0) 0.151. Committed. `git config core.fileMode false` set (Drive drops exec bits,
+    so the `colab/*.sh` files showed as modified).
+  - Resumed with `bash colab/resume_phaseA.sh high warm03 high_warm`. high_warm crashed at once ("Dataset not found or corrupted"):
+    all three chains extracted the CIFAR archive at the same time. Relaunched it; all 3 chains are running under MPS (high r8 ticket, warm03 r7
+    ticket, high_warm r0). **Fix:** `resume_phaseA.sh` now extracts the archive once before starting any chain.
+  - Left: high 3 (r8 ticket + reinit + shuffle), warm03 4, high_warm 15 = 22 trainings. Budget not re-calibrated yet (needs the remaining
+    hours from the Colab usage page).
