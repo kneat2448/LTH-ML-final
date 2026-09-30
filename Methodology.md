@@ -141,17 +141,17 @@ collapse rather than a systematic ticket deficit (F1, F2).
 | 1 | Code + tests (23 tests pass on the T4) | **done** |
 | 2 | Benchmark / smoke run on the T4: ~9 min per 15k training, 2.46 GB peak VRAM; budget re-derived | **done** (session 2) |
 | 3a | Phase A: `low` seed 0 (15 trainings) | **done** (session 4, 09:05 UTC) |
-| 3b | Phase A: `high`, `warm03` seed 0 (15 each), in parallel with `low` under MPS | **11/15 each** (r7, r8 left; paused at the end of session 4) |
-| 3b' | Phase A: `high_warm` seed 0 (15) | 0/15 (started at 09:04; r0 lost when the session ended) |
+| 3b | Phase A: `high`, `warm03` seed 0 (15 each), in parallel with `low` under MPS | high **13/15** (r8 reinit + shuffle left), warm03 **12/15** (r8 ticket + reinit + shuffle left); resumed in session 5 (04:40 UTC, 2026-09-30) |
+| 3b' | Phase A: `high_warm` seed 0 (15) | **1/15** (dense r0 done 05:04 UTC, session 5) |
 | 3c | Conv-4 chain at eta = 0.1 with the full S(t) trajectory | optional; needs `pilot/data/*.gz` on Drive (O8) |
-| 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | **PASSED on seed 0** (low 4/4, warm03 3/3, high 0/3 winning tickets, D12); r8 of high/warm03 and high_warm still to add |
+| 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | **PASSED on seed 0** (low 4/4, warm03 3/3, high 0/3 winning tickets, D12); r8 baselines of high/warm03 and high_warm still to add |
 | 5 | Phase B: seed 1 of `low`, `high` and `warm03` (error bars) | pending (after Gate A) |
 | 6 | Phase B: H4 (lam selection, then 3 conditions × 3 masks × ticket + shuffle) | pending |
 | 7 | Analysis: `python -m analysis.plots` → summary.csv, figs 1–5, metrics table, gate_a.md | script ready; re-run every 15 min by the autosave |
 | 8 | `results/FINDINGS.md`: verdict + numbers for H1–H4; final report | pending |
 
 **Compute (T4, D11 schedule):** Phase A ≈ 9 GPU-h and Phase B ≈ 10 GPU-h of training. The budget is **30 h of Colab
-runtime** (wall-clock usage, not GPU-hours; 27 h were left at the start of session 4). Every training goes to
+runtime** (wall-clock usage, not GPU-hours; 27 h were left at the start of session 4, **20 h at 05:02 UTC in session 5**). Every training goes to
 `results/compute_log.csv`. Runtime used is counted as the union of training intervals, because parallel chains share the runtime. If trainings take longer than 12 min, `iters` is cut
 to 10k before any condition or seed is cut.
 
@@ -250,7 +250,7 @@ to 10k before any condition or seed is cut.
   (the `high` dense value is 0.226), and report step 0 separately. *Adopted in session 4 (section 9); the table above and fig. 3 use it.*
 - **Weight correlation.** Dense R_0.2 is 0.64 (low), 0.56 (warm03) and 0.25 (high; chance is 0.2), which agrees with Liu et al. A large LR
   decorrelates theta_T from theta_0, and warmup keeps part of the correlation.
-- **Ticket accuracy vs dense, by sparsity (seed 0, as of 09:13 UTC):**
+- **Ticket accuracy vs dense, by sparsity (seed 0, as of 05:05 UTC, 2026-09-30):**
 
   | % remaining | low (dense 86.66%) | high (dense 89.83%) | warm03 (dense 87.48%) |
   |---|---|---|---|
@@ -260,10 +260,11 @@ to 10k before any condition or seed is cut.
   | 24.2 | +1.26 | −2.55 | +1.63 |
   | 17.0 | +1.18 | −3.70 | +1.17 |
   | 12.0 | +0.93 | −4.31 | +1.17 |
-  | 8.4 | +0.51 | | |
-  | 6.0 | −0.53 | | |
+  | 8.4 | +0.51 | −5.58 | +0.46 |
+  | 6.0 | −0.53 | −7.11 | |
 
-  Low-LR and warmup tickets stay above dense down to 8.4% (low) and 12% (warm03, lowest measured so far). The high-LR ticket loses accuracy steadily with sparsity.
+  Low-LR and warmup tickets stay above dense down to 8.4% (both low and warm03; warm03's margin shrinks from +1.17 to +0.46 pp at 8.4%).
+  The high-LR ticket loses accuracy steadily with sparsity, faster at the end (−4.31 → −5.58 → −7.11 pp from 12% to 6%).
 - **Ticket advantage over the best trained baseline (pp):** low +2.07 (49.1%), +3.28 (24.2%), +4.54 (12.0%), +6.00 (6.0%), growing
   monotonically with sparsity; warm03 +1.91 (49.1%), +3.87 (24.2%), +4.89 (12.0%); high +0.36 (49.1%), +0.13 (24.2%), +0.39 (12.0%).
   The best baseline was always the reinit (shuffle is lower). The low r8 ticket is 0.53 pp below dense, just outside the tolerance.
@@ -278,3 +279,11 @@ to 10k before any condition or seed is cut.
   This is a first hint against the simple H2 mechanism, pending more rounds and seed 1.
 - **Weight correlation (R_0.2).** It falls with sparsity in every condition (low 0.64 → 0.26, warm03 0.56 → 0.29) and stays near chance
   for high (0.23–0.25 throughout).
+- **Dense `high_warm` (r0, session 5).** eta 0.1 with 10k-step warmup: **89.46%**, between high (89.83%) and warm03 (87.48%);
+  R_0.2 **0.331** (high 0.247, warm03 0.558), max S(25–3k) 0.092, no spike. Warmup keeps some correlation with theta_0 even at eta = 0.1.
+  Sharpening during warmup is **cut off earlier** than in warm03: lambda_max rises 25.5 → 36.6 at step 500, then falls
+  once the LR passes ~0.01 (25.9 at 1k, 11.3 at 2k, 6.1 at 3k, ~2 from 6k). warm03 keeps sharpening to 52.7 at step 2k (LR 0.006).
+  In both, S peaks at ≈ 0.08–0.09 when lambda_max turns down, so the turn-over happens far below S = 1 (see the H2 note above).
+- **Sparse `high` tickets start flatter.** At 6.0% remaining, lambda_max at theta_0 ⊙ m is 5.1 (dense 25.5); it rises to 10.9 by
+  step 50 (S 0.286, this round's max) and then falls to ~2. So the sparse high tickets reach S ≈ 0.2–0.3 early, like the dense run,
+  while still losing 7 pp of accuracy. This fits the earlier reading: at eta = 0.1 the tickets fail without reaching the stability edge.

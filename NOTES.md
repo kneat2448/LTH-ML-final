@@ -8,8 +8,11 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ## 1. Current status (2026-09-29, session 4, Colab T4)
 
-- **SESSION 5 (2026-09-30, from 04:38 UTC): Phase A resumed.** high r7 had finished after all (38/60 done). high, warm03 and high_warm
-  run under MPS with the watcher. See the section 9 log for progress. The session-4 notes below are kept for reference.
+- **SESSION 5 (2026-09-30, from 04:38 UTC): Phase A resumed; 41/60 done at 05:05 UTC.** high, warm03 and high_warm run under MPS
+  with the watcher. Left: high 2 (r8 reinit + shuffle), warm03 3 (r8 ticket + reinit + shuffle), high_warm 14. Phase A should end ≈ 07:50 UTC.
+  **Budget (user, session 5): 20 h of Colab runtime left** → `src/utils.py`: `RUNTIME_USED_BEFORE_H = 10.0`, `RUNTIME_SINCE = 2026-09-30T05:02:00`.
+  (Chains started before that still print the old figures in their COST ESTIMATE lines.) Remaining plan ≈ 3 h Phase A + ≈ 9 h Phase B
+  ≈ 12 h, leaving ≈ 8 h reserve. See the section 9 log for progress. The session-4 notes below are kept for reference.
 
 - **END OF SESSION 4 (09:13 UTC, user shut the runtime down). Phase A 37/60 trainings done (62%); whole study ≈ 37/123 (30%).**
   | Chain | Done | Left |
@@ -449,3 +452,12 @@ Reminders:
     ticket, high_warm r0). **Fix:** `resume_phaseA.sh` now extracts the archive once before starting any chain.
   - Left: high 3 (r8 ticket + reinit + shuffle), warm03 4, high_warm 15 = 22 trainings. Budget not re-calibrated yet (needs the remaining
     hours from the Colab usage page).
+  - **05:02 UTC:** user: about 20 h of compute left → budget re-calibrated (10 h used at 05:02 UTC; see section 1). `test_utils` passes.
+  - **05:04 UTC batch (first results of session 5):**
+    - **high r8 (6.0%) ticket 82.72%: −7.11 pp vs dense** (gap −4.31 → −5.58 → −7.11 pp from 12% to 6%). max S(25–3k) 0.286 (at step 50),
+      S(0) 0.134. At this sparsity lambda_max at init is only 5.1 (dense 25.5), rises to 10.9 at step 50, then falls to ~2. No spike.
+    - **warm03 r7 (8.4%) ticket 87.94%: +0.46 pp vs dense** (still above dense, but the margin is shrinking: +1.17 at 12%). max S 0.045, R_0.2 0.229.
+    - **high_warm r0 (dense, eta 0.1 + 10k warmup) 89.46%**, R_0.2 0.331 (between high 0.247 and warm03 0.558), max S(25–3k) 0.092, no spike.
+      Sharpening during warmup stops earlier than in warm03: lambda_max 25.5 → 36.6 at step 500, then falls as the LR passes ~0.01
+      (11.3 at 2k, 6.1 at 3k). warm03 sharpened to 52.7 at 2k. In both runs S peaks at ≈ 0.08–0.09 when lambda_max turns down.
+    - `Methodology.md` updated (step statuses, table, accuracy-vs-dense table, high_warm and sparse-high sharpness notes).
