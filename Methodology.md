@@ -142,10 +142,10 @@ collapse rather than a systematic ticket deficit (F1, F2).
 | 2 | Benchmark / smoke run on the T4: ~9 min per 15k training, 2.46 GB peak VRAM; budget re-derived | **done** (session 2) |
 | 3a | Phase A: `low` seed 0 (15 trainings) | **done** (session 4, 09:05 UTC) |
 | 3b | Phase A: `high`, `warm03` seed 0 (15 each), in parallel with `low` under MPS | high **15/15, done** (05:53 UTC, session 5); warm03 **14/15** (r8 shuffle running) |
-| 3b' | Phase A: `high_warm` seed 0 (15) | **5/15** at 06:44 UTC (session 5), in parallel with the seed-1 chains |
+| 3b' | Phase A: `high_warm` seed 0 (15) | **8/15** at 07:25 UTC (session 5), in parallel with the seed-1 chains |
 | 3c | Conv-4 chain at eta = 0.1 with the full S(t) trajectory | optional; needs `pilot/data/*.gz` on Drive (O8) |
 | 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | **PASSED on seed 0, final for the three gate conditions** (low 4/4, warm03 4/4, high 0/4 winning tickets, D12) |
-| 5 | Phase B: seed 1 of `low`, `high` and `warm03` (error bars) | **queued** (session 5): low/high start when warm03 seed 0 ends (≈ 06:20 UTC), warm03 when high_warm ends; in parallel with high_warm under MPS |
+| 5 | Phase B: seed 1 of `low`, `high` and `warm03` (error bars) | **running** (session 5): low s1 2/15, high s1 3/15 at 07:25 UTC; warm03 s1 starts when high_warm ends |
 | 6 | Phase B: H4 (lam selection, then 3 conditions × 3 masks × ticket + shuffle) | pending |
 | 7 | Analysis: `python -m analysis.plots` → summary.csv, figs 1–5, metrics table, gate_a.md | script ready; re-run every 15 min by the autosave |
 | 8 | `results/FINDINGS.md`: verdict + numbers for H1–H4; final report | pending |
@@ -273,7 +273,7 @@ to 10k before any condition or seed is cut.
   | 70.1 | +0.77 | −0.44 | +0.74 | +0.64 |
   | 49.1 | +1.19 | −0.62 | +1.09 | +0.29 |
   | 34.5 | +1.21 | −1.47 | +1.04 | +0.84 |
-  | 24.2 | +1.26 | −2.55 | +1.63 | |
+  | 24.2 | +1.26 | −2.55 | +1.63 | +0.89 |
   | 17.0 | +1.18 | −3.70 | +1.17 | |
   | 12.0 | +0.93 | −4.31 | +1.17 | |
   | 8.4 | +0.51 | −5.58 | +0.46 | |
@@ -311,3 +311,7 @@ to 10k before any condition or seed is cut.
 - **Seed 1 dense runs (session 5):** low 86.48% (seed 0: 86.66%), high 89.55% (89.83%): the dense accuracies replicate within 0.3 pp.
   **high seed 1 has S(0) = 1.07** (lambda_max at its theta_0 ≈ 40.6, vs 25.5 for seed 0): it *starts* above the stability limit, yet does not
   diverge or spike (1.0x), max S(25–3k) 0.495, R_0.2 0.248. Sharpness at init does not predict failure, as H2 assumes (and why S(0) is reported apart).
+- **high_warm r4 (24.2%, session 5):** ticket 90.35% (+0.89 pp vs dense), reinit 86.67% → **+3.68 pp**, the 2nd winning ticket at eta = 0.1
+  (+1.47 at 49.1%). high_warm tickets so far: +0.64, +0.29, +0.84, +0.89 pp vs dense, all winning where a baseline exists; max S(25–3k) 0.05–0.07.
+- **Seed 1 replicates seed 0 so far (ticket − dense, pp):** low r1 +0.63 (seed 0 +0.77); high r1 −0.32 (−0.44), r2 −1.02 (−0.62).
+  The high-LR ticket deficit appears on both seeds. high s1 S(0) stays high on the sparse masks too (0.53, 0.87), with no divergence.

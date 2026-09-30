@@ -36,7 +36,8 @@ last_save=$SECONDS
 while true; do
   for f in $(git ls-files --others --exclude-standard 'results/*/seed*/round*.json' 2>/dev/null); do
     sleep 20  # let the chain finish writing log/compute_log
-    cond=$(echo $f | cut -d/ -f2); base=$(basename $f .json)
+    cond=$(echo $f | cut -d/ -f2); seed=$(echo $f | cut -d/ -f3); base=$(basename $f .json)
+    phase="Phase A"; [ "$seed" != seed0 ] && phase="Phase B ($seed)"
     msg=$(python - "$f" <<'PY'
 import json,sys
 from src.metrics import stability_summary
@@ -45,7 +46,7 @@ print(f"remaining {d['remaining']:.3f}, acc {d['test']['acc']:.4f}, S(0) {st['S0
 PY
 )
     python -m analysis.methodology_table >/dev/null 2>&1
-    commit "Phase A: $cond ${base/_/ }: $msg" "$f" results/$cond results/compute_log.csv Methodology.md \
+    commit "$phase: $cond ${base/_/ }: $msg" "$f" results/$cond results/compute_log.csv Methodology.md \
       && echo "$(date -u +%T) committed $f" && push
   done
   if [ $((SECONDS - last_save)) -ge $AUTOSAVE_S ]; then

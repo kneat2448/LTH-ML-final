@@ -8,7 +8,7 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ## 1. Current status (2026-09-29, session 4, Colab T4)
 
-- **SESSION 5 (2026-09-30, from 04:38 UTC): Phase A resumed; 47/60 done at 05:54 UTC, Gate A final: PASSED.** high, warm03 and high_warm run under MPS
+- **SESSION 5 (2026-09-30, from 04:38 UTC): Phase A resumed; 52/60 done at 07:25 UTC (only high_warm left), Gate A final: PASSED; seed 1 running.** high, warm03 and high_warm run under MPS
   with the watcher. Left: warm03 1 (r8 shuffle), high_warm 12. high is complete. **Phase B seed 1 (low, high) starts when warm03 exits (≈ 06:20), warm03 seed 1 when
   high_warm exits**; high_warm then ends ≈ 10:45 UTC, seed 1 ≈ 13:30–14:00 UTC. Restart after a VM reset: `bash colab/resume_phaseA.sh high_warm; bash colab/resume_phaseB.sh`.
   **Budget (user, session 5): 20 h of Colab runtime left** → `src/utils.py`: `RUNTIME_USED_BEFORE_H = 10.0`, `RUNTIME_SINCE = 2026-09-30T05:02:00`.
@@ -492,3 +492,9 @@ Reminders:
     - **low s1 r0 (dense) 86.48%** (seed 0 86.66%), R_0.2 0.641. **high s1 r0 (dense) 89.55%** (seed 0 89.83%), no spike, but **S(0) = 1.07**:
       seed 1's theta_0 has lambda_max ≈ 40.6 (seed 0: 25.5), so it starts above S = 1 and still trains normally (max S(25–3k) 0.495).
     - Forecast unchanged: high_warm ≈ 10:30, low/high s1 ≈ 12:15, then warm03 s1 + H4 → all done ≈ 17:00 UTC, ≈ 22 h used.
+  - **07:25 UTC check:** 3 chains running, GPU 100%. Runtime 12.4 h. Phase A 52/60, seed 1 5/45.
+    - **high_warm r4 (24.2%) ticket 90.35% (+0.89 pp vs dense), reinit 86.67% → +3.68 pp**: 2nd winning ticket at eta = 0.1. r4 shuffle next.
+    - **Seed 1 replicates (ticket − dense):** low r1 87.11% (+0.63 pp; seed 0 +0.77); high r1 89.23% (−0.32; seed 0 −0.44), high r2 88.53% (−1.02; seed 0 −0.62).
+      high s1 S(0) 0.53 / 0.87 on the sparse masks, no divergence, no spikes.
+    - `colab/watcher.sh`: commit messages now say `Phase B (seed1)` for seed-1 results (the ones before 07:30 say "Phase A"). Watcher restarted
+      (a `pkill -f colab/watcher.sh` also killed the calling shell; use `pkill -f "^bash colab/watcher.sh"`).
