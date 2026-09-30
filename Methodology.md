@@ -241,6 +241,7 @@ to 10k before any condition or seed is cut.
 | high_warm | 0 | 1 | 70.1 | ticket | 90.10% | 0.000 | 0.069 | 0.306 | no |
 | high_warm | 0 | 2 | 49.1 | reinit | 88.28% | 0.000 | 0.071 | 0.285 | no |
 | high_warm | 0 | 2 | 49.1 | ticket | 89.75% | 0.000 | 0.072 | 0.285 | no |
+| high_warm | 0 | 3 | 34.5 | ticket | 90.30% | 0.000 | 0.051 | 0.260 | no |
 <!-- results-table:end -->
 
 **Observations so far (seed 0, single runs, directional only):**
