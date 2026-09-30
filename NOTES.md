@@ -481,3 +481,8 @@ Reminders:
     **Correction of the 05:54 estimate:** the saving is ≈ 15 min, not ≈ 1 h. Measured: 9.3 min per training alone vs ≈ 24 min per training
     with 3 in parallel → 6.5 vs 7.5 trainings/h (+16%). **Cost: high_warm (Phase A) now finishes ≈ 10:45 UTC instead of ≈ 08:00**, because it
     shares the GPU. Remaining work: 12 high_warm + 45 seed-1 trainings ≈ 7.6 h → Phase A + seed 1 done ≈ 13:30–14:00 UTC (≈ 18.5 h used), then H4 ≈ 3 h.
+  - **06:12 UTC:** **warm03 seed 0 complete (15/15)**; last training r8 shuffle: `acc=0.8026 f1=0.8013 R02=0.299 maxS3k=0.065 diverged=False wall=17.4min sharp_overhead=97.2% peakVRAM=2460MB`. low seed 1 started by hand at 06:11 (3rd GPU slot),
+    high seed 1 by the launcher at 06:12. Now running under MPS: high_warm s0 (r3), low s1 (r0), high s1 (r0). warm03 s1 waits for high_warm.
+    Phase A 49/60. Runtime 11.1 h. Each IMP chain is sequential (round r needs round r−1's mask), but the chains are independent; the T4 is
+    compute-bound, so 3 processes under MPS is the useful maximum (4 is slower, section 6). **H4 is unblocked** (its masks come from warm03 seed 0
+    r3/r6/r8, now done); use it to fill GPU slots as chains finish.
