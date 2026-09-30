@@ -8,8 +8,8 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ## 1. Current status (2026-09-29, session 4, Colab T4)
 
-- **SESSION 5 (2026-09-30, from 04:38 UTC): Phase A resumed; 41/60 done at 05:05 UTC.** high, warm03 and high_warm run under MPS
-  with the watcher. Left: high 2 (r8 reinit + shuffle), warm03 3 (r8 ticket + reinit + shuffle), high_warm 14. Phase A should end ≈ 07:50 UTC.
+- **SESSION 5 (2026-09-30, from 04:38 UTC): Phase A resumed; 47/60 done at 05:54 UTC, Gate A final: PASSED.** high, warm03 and high_warm run under MPS
+  with the watcher. Left: warm03 1 (r8 shuffle), high_warm 12. high is complete. Phase A should end ≈ 08:00 UTC.
   **Budget (user, session 5): 20 h of Colab runtime left** → `src/utils.py`: `RUNTIME_USED_BEFORE_H = 10.0`, `RUNTIME_SINCE = 2026-09-30T05:02:00`.
   (Chains started before that still print the old figures in their COST ESTIMATE lines.) Remaining plan ≈ 3 h Phase A + ≈ 9 h Phase B
   ≈ 12 h, leaving ≈ 8 h reserve. See the section 9 log for progress. The session-4 notes below are kept for reference.
@@ -461,3 +461,13 @@ Reminders:
       Sharpening during warmup stops earlier than in warm03: lambda_max 25.5 → 36.6 at step 500, then falls as the LR passes ~0.01
       (11.3 at 2k, 6.1 at 3k). warm03 sharpened to 52.7 at 2k. In both runs S peaks at ≈ 0.08–0.09 when lambda_max turns down.
     - `Methodology.md` updated (step statuses, table, accuracy-vs-dense table, high_warm and sparse-high sharpness notes).
+  - **05:54 UTC check (6 more results):**
+    - **high is complete (15/15).** r8 (6.0%): ticket 82.72%, reinit 82.75%, shuffle 82.15% → **advantage −0.03 pp**; high ends with 0/4 winning
+      tickets. At 6% the high ticket is no better than a random reinit.
+    - **warm03 r8 (6.0%) ticket 87.86% (+0.38 pp vs dense), reinit 80.43% → +7.43 pp**, its 4th win. warm03 tickets beat dense at every sparsity.
+      warm03 r8 shuffle is running (warm03's last training).
+    - **Gate A final for seed 0: PASSED** (low 4/4, warm03 4/4, high 0/4 winning). `results/gate_a.md` regenerated.
+    - **high_warm r1 (70.1%) 90.10% (+0.64 pp vs its dense 89.46%)**, r2 (49.1%) 89.75% (+0.29 pp), max S 0.069 / 0.072. The best accuracy
+      in the study so far. Unlike high, the warmup tickets at eta = 0.1 are above dense (H3 direction). r2 reinit running.
+    - Runtime used 10.87 h (calibrated). **Forecast:** warm03 ends ≈ 06:20; high_warm then runs alone, 11 trainings × ~9 min → **Phase A done ≈ 08:00 UTC,
+      ≈ 12.9 h used**. Phase B (seed 1 low/high/warm03 ≈ 6.3 h under MPS + H4 ≈ 3 h) → ≈ 22 h used, ≈ 8 h reserve.

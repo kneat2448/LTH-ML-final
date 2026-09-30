@@ -141,10 +141,10 @@ collapse rather than a systematic ticket deficit (F1, F2).
 | 1 | Code + tests (23 tests pass on the T4) | **done** |
 | 2 | Benchmark / smoke run on the T4: ~9 min per 15k training, 2.46 GB peak VRAM; budget re-derived | **done** (session 2) |
 | 3a | Phase A: `low` seed 0 (15 trainings) | **done** (session 4, 09:05 UTC) |
-| 3b | Phase A: `high`, `warm03` seed 0 (15 each), in parallel with `low` under MPS | high **13/15** (r8 reinit + shuffle left), warm03 **12/15** (r8 ticket + reinit + shuffle left); resumed in session 5 (04:40 UTC, 2026-09-30) |
-| 3b' | Phase A: `high_warm` seed 0 (15) | **1/15** (dense r0 done 05:04 UTC, session 5) |
+| 3b | Phase A: `high`, `warm03` seed 0 (15 each), in parallel with `low` under MPS | high **15/15, done** (05:53 UTC, session 5); warm03 **14/15** (r8 shuffle running) |
+| 3b' | Phase A: `high_warm` seed 0 (15) | **3/15** at 05:54 UTC (session 5); runs alone after warm03 ends |
 | 3c | Conv-4 chain at eta = 0.1 with the full S(t) trajectory | optional; needs `pilot/data/*.gz` on Drive (O8) |
-| 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | **PASSED on seed 0** (low 4/4, warm03 3/3, high 0/3 winning tickets, D12); r8 baselines of high/warm03 and high_warm still to add |
+| 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | **PASSED on seed 0, final for the three gate conditions** (low 4/4, warm03 4/4, high 0/4 winning tickets, D12) |
 | 5 | Phase B: seed 1 of `low`, `high` and `warm03` (error bars) | pending (after Gate A) |
 | 6 | Phase B: H4 (lam selection, then 3 conditions × 3 masks × ticket + shuffle) | pending |
 | 7 | Analysis: `python -m analysis.plots` → summary.csv, figs 1–5, metrics table, gate_a.md | script ready; re-run every 15 min by the autosave |
@@ -256,25 +256,27 @@ to 10k before any condition or seed is cut.
   (the `high` dense value is 0.226), and report step 0 separately. *Adopted in session 4 (section 9); the table above and fig. 3 use it.*
 - **Weight correlation.** Dense R_0.2 is 0.64 (low), 0.56 (warm03) and 0.25 (high; chance is 0.2), which agrees with Liu et al. A large LR
   decorrelates theta_T from theta_0, and warmup keeps part of the correlation.
-- **Ticket accuracy vs dense, by sparsity (seed 0, as of 05:05 UTC, 2026-09-30):**
+- **Ticket accuracy vs dense, by sparsity (seed 0, as of 05:54 UTC, 2026-09-30):**
 
-  | % remaining | low (dense 86.66%) | high (dense 89.83%) | warm03 (dense 87.48%) |
-  |---|---|---|---|
-  | 70.1 | +0.77 | −0.44 | +0.74 |
-  | 49.1 | +1.19 | −0.62 | +1.09 |
-  | 34.5 | +1.21 | −1.47 | +1.04 |
-  | 24.2 | +1.26 | −2.55 | +1.63 |
-  | 17.0 | +1.18 | −3.70 | +1.17 |
-  | 12.0 | +0.93 | −4.31 | +1.17 |
-  | 8.4 | +0.51 | −5.58 | +0.46 |
-  | 6.0 | −0.53 | −7.11 | |
+  | % remaining | low (dense 86.66%) | high (dense 89.83%) | warm03 (dense 87.48%) | high_warm (dense 89.46%) |
+  |---|---|---|---|---|
+  | 70.1 | +0.77 | −0.44 | +0.74 | +0.64 |
+  | 49.1 | +1.19 | −0.62 | +1.09 | +0.29 |
+  | 34.5 | +1.21 | −1.47 | +1.04 | |
+  | 24.2 | +1.26 | −2.55 | +1.63 | |
+  | 17.0 | +1.18 | −3.70 | +1.17 | |
+  | 12.0 | +0.93 | −4.31 | +1.17 | |
+  | 8.4 | +0.51 | −5.58 | +0.46 | |
+  | 6.0 | −0.53 | −7.11 | +0.38 |
 
-  Low-LR and warmup tickets stay above dense down to 8.4% (both low and warm03; warm03's margin shrinks from +1.17 to +0.46 pp at 8.4%).
+  warm03 tickets stay above dense at every sparsity, down to 6.0% (+0.38 pp); low drops below at 6.0% (−0.53 pp).
+  The first high_warm tickets are above their own dense network (+0.64, +0.29 pp), unlike high.
   The high-LR ticket loses accuracy steadily with sparsity, faster at the end (−4.31 → −5.58 → −7.11 pp from 12% to 6%).
 - **Ticket advantage over the best trained baseline (pp):** low +2.07 (49.1%), +3.28 (24.2%), +4.54 (12.0%), +6.00 (6.0%), growing
-  monotonically with sparsity; warm03 +1.91 (49.1%), +3.87 (24.2%), +4.89 (12.0%); high +0.36 (49.1%), +0.13 (24.2%), +0.39 (12.0%).
+  monotonically with sparsity; warm03 +1.91 (49.1%), +3.87 (24.2%), +4.89 (12.0%), **+7.43 (6.0%)**; high +0.36 (49.1%), +0.13 (24.2%), +0.39 (12.0%), **−0.03 (6.0%)**
+  (ticket 82.72%, reinit 82.75%, shuffle 82.15%: at 6% the high ticket is no better than a random reinit).
   The best baseline was always the reinit (shuffle is lower). The low r8 ticket is 0.53 pp below dense, just outside the tolerance.
-- **Gate A reading (end of session 4): PASSED on seed 0.** low passes (4/4) and warm03 passes (3/3). high has three positive advantages,
+- **Gate A (final for seed 0, session 5): PASSED**: low 4/4, warm03 4/4, high 0/4 winning. Reading at the end of session 4: low passes (4/4) and warm03 passes (3/3). high has three positive advantages,
   so a literal "no positive advantage at high" criterion would fail. They are 10–30x smaller than low/warm03 and likely within
   seed noise (one seed). By the section-5 *winning-ticket* definition, which also requires ticket acc ≥ dense − 0.5 pp, high has **no**
   winning ticket at either point (−0.62 and −2.55 pp vs dense). **Decision (D12): Gate A's `high` criterion uses the winning-ticket
