@@ -249,6 +249,7 @@ to 10k before any condition or seed is cut.
 | high_warm | 0 | 2 | 49.1 | ticket | 89.75% | 0.000 | 0.072 | 0.285 | no |
 | high_warm | 0 | 3 | 34.5 | ticket | 90.30% | 0.000 | 0.051 | 0.260 | no |
 | high_warm | 0 | 4 | 24.2 | reinit | 86.67% | 0.000 | 0.067 | 0.263 | no |
+| high_warm | 0 | 4 | 24.2 | shuffle | 86.90% | 0.000 | 0.191 | 0.270 | no |
 | high_warm | 0 | 4 | 24.2 | ticket | 90.35% | 0.000 | 0.070 | 0.239 | no |
 <!-- results-table:end -->
 
