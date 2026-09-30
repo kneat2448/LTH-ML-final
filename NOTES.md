@@ -486,3 +486,9 @@ Reminders:
     Phase A 49/60. Runtime 11.1 h. Each IMP chain is sequential (round r needs round r−1's mask), but the chains are independent; the T4 is
     compute-bound, so 3 processes under MPS is the useful maximum (4 is slower, section 6). **H4 is unblocked** (its masks come from warm03 seed 0
     r3/r6/r8, now done); use it to fill GPU slots as chains finish.
+  - **06:44 UTC check:** 3 chains running, GPU 100%. Runtime 11.6 h. Phase A 50/60, seed 1 2/45.
+    - **high_warm r2 reinit 88.28% vs ticket 89.75% → +1.47 pp at 49.1%**: the first winning ticket at eta = 0.1 (ticket above its dense).
+      **high_warm r3 (34.5%) 90.30%** (+0.84 pp vs dense), best in the study; max S 0.051.
+    - **low s1 r0 (dense) 86.48%** (seed 0 86.66%), R_0.2 0.641. **high s1 r0 (dense) 89.55%** (seed 0 89.83%), no spike, but **S(0) = 1.07**:
+      seed 1's theta_0 has lambda_max ≈ 40.6 (seed 0: 25.5), so it starts above S = 1 and still trains normally (max S(25–3k) 0.495).
+    - Forecast unchanged: high_warm ≈ 10:30, low/high s1 ≈ 12:15, then warm03 s1 + H4 → all done ≈ 17:00 UTC, ≈ 22 h used.
