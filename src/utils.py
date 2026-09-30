@@ -24,11 +24,11 @@ BUDGET_GPU_H = {"4060": 18.0}
 # Colab budget: 30 h of runtime (wall-clock usage, whatever the GPU), not GPU-hours. Parallel chains
 # under MPS share the same runtime, so usage is the union of the training intervals, not their sum.
 RUNTIME_BUDGET_H = 30.0
-# Runtime already used before RUNTIME_SINCE (stated by the user: session 4 27 h left; session 5 20 h left).
+# Runtime already used before RUNTIME_SINCE (stated by the user: session 4 27 h left; session 5 20 h left, 15 h left at 09:30 UTC).
 # Only trainings that end after RUNTIME_SINCE are added on top. Re-calibrate both from the Colab
 # usage page when they drift: idle runtime (setup, analysis, gaps between runs) is not logged.
-RUNTIME_USED_BEFORE_H = 10.0
-RUNTIME_SINCE = "2026-09-30T05:02:00"
+RUNTIME_USED_BEFORE_H = 15.0
+RUNTIME_SINCE = "2026-09-30T09:30:30"
 
 
 def set_seed(seed: int) -> None:

@@ -505,3 +505,7 @@ Reminders:
     warm03 as a 4th chain). GPU 100%, watcher running. Status: Phase A 54/60 (high_warm 6 left), seed 1 10/45 (low 5, high 5; warm03 0).
     Logged runtime 13.41 h, **excluding the idle time around the reset, so re-calibrate from the Colab usage page.**
     Forecast: 41 trainings left at ≈ 6.5/h → seed 1 done ≈ 16:00 UTC (≈ 20 h logged), then H4 ≈ 3 h.
+  - **09:30 UTC: budget re-calibrated (user): 15 h of Colab runtime left** → `src/utils.py`: `RUNTIME_USED_BEFORE_H = 15.0`,
+    `RUNTIME_SINCE = 2026-09-30T09:30:30`. The reset cost ≈ 1.6 h beyond the logged 13.41 h. The chains running now use the old constants in
+    their COST ESTIMATE lines. Plan: seed 1 ≈ 6.5 h wall (done ≈ 16:00) + H4 ≈ 3 h → ≈ 9.5 h, leaving ≈ 5.5 h reserve. Start H4 in any GPU slot
+    that frees up (low/high s1 end ≈ 13:30, while warm03 s1 still runs) so the GPU never runs fewer than 3 chains.
