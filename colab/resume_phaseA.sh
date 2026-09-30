@@ -12,7 +12,7 @@ export LTH_RAW_DATA=/content/cifar_raw CUDA_MPS_PIPE_DIRECTORY=/tmp/mps_pipe CUD
 mkdir -p $CUDA_MPS_PIPE_DIRECTORY $CUDA_MPS_LOG_DIRECTORY
 pgrep -f nvidia-cuda-mps-control >/dev/null || nvidia-cuda-mps-control -d
 for c in $CONDS; do
-  if pgrep -f "src.imp configs/resnet20_$c.yaml" >/dev/null; then echo "$c already running"; continue; fi
+  if pgrep -f "src.imp configs/resnet20_$c.yaml$" >/dev/null; then echo "$c already running"; continue; fi
   nohup python -m src.imp configs/resnet20_$c.yaml >> /content/phaseA_$c.out 2>&1 &
   echo "started $c"
 done

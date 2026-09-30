@@ -9,7 +9,8 @@ measured and what is still open. **Update it at the end of every work session.**
 ## 1. Current status (2026-09-29, session 4, Colab T4)
 
 - **SESSION 5 (2026-09-30, from 04:38 UTC): Phase A resumed; 47/60 done at 05:54 UTC, Gate A final: PASSED.** high, warm03 and high_warm run under MPS
-  with the watcher. Left: warm03 1 (r8 shuffle), high_warm 12. high is complete. Phase A should end ≈ 08:00 UTC.
+  with the watcher. Left: warm03 1 (r8 shuffle), high_warm 12. high is complete. **Phase B seed 1 (low, high) starts when warm03 exits (≈ 06:20), warm03 seed 1 when
+  high_warm exits**; high_warm then ends ≈ 10:45 UTC, seed 1 ≈ 13:30–14:00 UTC. Restart after a VM reset: `bash colab/resume_phaseA.sh high_warm; bash colab/resume_phaseB.sh`.
   **Budget (user, session 5): 20 h of Colab runtime left** → `src/utils.py`: `RUNTIME_USED_BEFORE_H = 10.0`, `RUNTIME_SINCE = 2026-09-30T05:02:00`.
   (Chains started before that still print the old figures in their COST ESTIMATE lines.) Remaining plan ≈ 3 h Phase A + ≈ 9 h Phase B
   ≈ 12 h, leaving ≈ 8 h reserve. See the section 9 log for progress. The session-4 notes below are kept for reference.
@@ -163,6 +164,7 @@ python -m analysis.plots                                              # summary.
 | `colab/run_on_colab.ipynb` | Colab runner (mount, env, tests, smoke, benchmark summary, Phase A/B cells) |
 | `colab/watcher.sh` | session 4: commits + pushes each result, 15-min autosave of results/Methodology/NOTES |
 | `colab/resume_phaseA.sh` | session 4: one-command resume after a VM restart (CIFAR copy, MPS, chains, watcher); default = all four Phase A chains |
+| `colab/resume_phaseB.sh` | session 5: start/resume the seed-1 chains (default low high warm03) under MPS; `WAIT_FOR=<cond>` waits for that seed-0 chain to exit |
 | `colab/start_after.sh` | session 4: start one chain when another finishes (used for low → high_warm) |
 | `tests/` | 23 tests (section 12 list plus schedules incl. the D11 schedule, NaN-mask guard, negative-dominant spectrum) |
 | `data/cifar-10-python.tar.gz` | official archive on Drive (not in git), uploaded from the laptop in session 2 |
@@ -471,3 +473,11 @@ Reminders:
       in the study so far. Unlike high, the warmup tickets at eta = 0.1 are above dense (H3 direction). r2 reinit running.
     - Runtime used 10.87 h (calibrated). **Forecast:** warm03 ends ≈ 06:20; high_warm then runs alone, 11 trainings × ~9 min → **Phase A done ≈ 08:00 UTC,
       ≈ 12.9 h used**. Phase B (seed 1 low/high/warm03 ≈ 6.3 h under MPS + H4 ≈ 3 h) → ≈ 22 h used, ≈ 8 h reserve.
+  - **05:57 UTC: Phase B seed 1 queued (user approved).** New `colab/resume_phaseB.sh` (seed-1 chains under MPS, same setup as Phase A; also
+    the restart command after a VM reset: `bash colab/resume_phaseB.sh`). Two waiting launchers:
+    `WAIT_FOR=warm03 … resume_phaseB.sh low high` (starts when warm03 seed 0 exits, ≈ 06:20) and `WAIT_FOR=high_warm … resume_phaseB.sh warm03`
+    (starts when high_warm exits). Output in `/content/phaseB_launch.out` and `/content/phaseB_<c>_s1.out`; results go to `results/<c>/seed1/`.
+    The pgrep patterns in `resume_phaseA.sh` and `start_after.sh` are now anchored (`…yaml$`) so they do not match the seed-1 processes.
+    **Correction of the 05:54 estimate:** the saving is ≈ 15 min, not ≈ 1 h. Measured: 9.3 min per training alone vs ≈ 24 min per training
+    with 3 in parallel → 6.5 vs 7.5 trainings/h (+16%). **Cost: high_warm (Phase A) now finishes ≈ 10:45 UTC instead of ≈ 08:00**, because it
+    shares the GPU. Remaining work: 12 high_warm + 45 seed-1 trainings ≈ 7.6 h → Phase A + seed 1 done ≈ 13:30–14:00 UTC (≈ 18.5 h used), then H4 ≈ 3 h.

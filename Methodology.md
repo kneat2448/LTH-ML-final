@@ -145,7 +145,7 @@ collapse rather than a systematic ticket deficit (F1, F2).
 | 3b' | Phase A: `high_warm` seed 0 (15) | **3/15** at 05:54 UTC (session 5); runs alone after warm03 ends |
 | 3c | Conv-4 chain at eta = 0.1 with the full S(t) trajectory | optional; needs `pilot/data/*.gz` on Drive (O8) |
 | 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | **PASSED on seed 0, final for the three gate conditions** (low 4/4, warm03 4/4, high 0/4 winning tickets, D12) |
-| 5 | Phase B: seed 1 of `low`, `high` and `warm03` (error bars) | pending (after Gate A) |
+| 5 | Phase B: seed 1 of `low`, `high` and `warm03` (error bars) | **queued** (session 5): low/high start when warm03 seed 0 ends (≈ 06:20 UTC), warm03 when high_warm ends; in parallel with high_warm under MPS |
 | 6 | Phase B: H4 (lam selection, then 3 conditions × 3 masks × ticket + shuffle) | pending |
 | 7 | Analysis: `python -m analysis.plots` → summary.csv, figs 1–5, metrics table, gate_a.md | script ready; re-run every 15 min by the autosave |
 | 8 | `results/FINDINGS.md`: verdict + numbers for H1–H4; final report | pending |
