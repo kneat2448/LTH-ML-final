@@ -537,3 +537,5 @@ Reminders:
     and only later (2+2·beta)/lambda, and the late SGD-M threshold is "much smaller" at finite batch.** So S(0) is understated 1.9x
     (dense high 1.27 vs 2/lambda) and S = 1 is not the minibatch edge. Both caveats are in PHASE_A.md §4.
 
+  - **05:23 UTC hourly check:** 3 chains + watcher + H4 queues alive, GPU 100%. Phase A 59/60 (high_warm r8 reinit/shuffle left), seed 1 20/45 (low 10, high 10).
+    Seed 1 r6 (12.0%): low ticket 87.39% (+0.91 pp vs dense; seed 0 +0.93), high 85.63% (−3.92; seed 0 −4.31). Runtime 17.6 h of 30. Forecast unchanged (≈ 12:30 UTC).

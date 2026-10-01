@@ -1,0 +1,2 @@
+COST ESTIMATE warm03: 15 trainings x 9.0 min = 2.25 h runtime on Tesla T4; used so far 17.95 / 30 h
+[warm03 seed1 r0 ticket] mode=warmup remaining=1.0000

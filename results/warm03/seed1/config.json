@@ -1,0 +1,53 @@
+{
+ "name": "warm03",
+ "lr": 0.03,
+ "warmup_iters": 10000,
+ "sam_rho": null,
+ "anchor_lam": null,
+ "model": "resnet20",
+ "dataset": "cifar10",
+ "momentum": 0.9,
+ "weight_decay": 0.0001,
+ "batch_size": 128,
+ "iters": 15000,
+ "milestones": [
+  10000,
+  12500
+ ],
+ "lr_decay": 0.1,
+ "prune_rate": 0.3,
+ "output_prune_scale": 0.5,
+ "rounds": 8,
+ "seeds": [
+  0
+ ],
+ "baselines": {
+  "reinit": [
+   2,
+   4,
+   6,
+   8
+  ],
+  "shuffle": [
+   4,
+   8
+  ]
+ },
+ "sharpness": {
+  "batch": 2048,
+  "iters": 10,
+  "micro_batch": 512,
+  "every": 500,
+  "dense_until": 3000,
+  "then_every": 3000,
+  "early": [
+   25,
+   50,
+   100,
+   200
+  ]
+ },
+ "divergence_val_acc": 0.15,
+ "trained_acc": 0.2,
+ "eval_batch": 1000
+}
