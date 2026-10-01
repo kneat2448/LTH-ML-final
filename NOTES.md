@@ -539,3 +539,5 @@ Reminders:
 
   - **05:23 UTC hourly check:** 3 chains + watcher + H4 queues alive, GPU 100%. Phase A 59/60 (high_warm r8 reinit/shuffle left), seed 1 20/45 (low 10, high 10).
     Seed 1 r6 (12.0%): low ticket 87.39% (+0.91 pp vs dense; seed 0 +0.93), high 85.63% (−3.92; seed 0 −4.31). Runtime 17.6 h of 30. Forecast unchanged (≈ 12:30 UTC).
+  - **05:55 UTC: Phase A complete (60/60).** high_warm r8 (6.0%): ticket 88.35%, reinit 82.42%, shuffle 82.34% → +5.93 pp, but ticket −1.11 pp vs dense → not winning; high_warm wins 3/4. warm03 s1 started 05:34 (`resume_phaseB.sh` waiter). `PHASE_A.md` pending cells filled.
+    Seed 1 r6 advantages: low +4.70 pp (ticket 87.39 vs reinit 82.69; seed 0 +4.54), high +0.67 (85.63 vs 84.96; seed 0 +0.39). Runtime 18.0 h.

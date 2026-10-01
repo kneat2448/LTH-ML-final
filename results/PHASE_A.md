@@ -1,7 +1,6 @@
 # Phase A write-up (seed 0): draft
 
-*Status: draft of 2026-10-01, 05:00 UTC. Phase A is 58/60; the high_warm r8 (5.8%) reinit and shuffle are still
-running, and those cells are marked "pending". Seed 1 (Phase B) is running, so every number here is a **single run**. Treat
+*Status: draft of 2026-10-01, 05:55 UTC. **Phase A is complete (60/60).** Seed 1 (Phase B) is running, so every number here is a **single run**. Treat
 differences under ~0.5 pp as noise until seed 1 is in. All numbers come from `results/summary.csv`
 (`python -m analysis.plots`); the per-run table is in `Methodology.md` section 10. Setup and definitions: `Methodology.md` sections 3–6.*
 
@@ -44,7 +43,7 @@ ticket ≥ dense − 0.5 pp.
 | 49.1 | +2.07 ✓ | +0.36 | +1.91 ✓ | +1.47 ✓ |
 | 24.2 | +3.28 ✓ | +0.13 | +3.87 ✓ | +3.45 ✓ |
 | 12.0 | +4.54 ✓ | +0.39 | +4.89 ✓ | +5.11 ✓ |
-| 6.0 | +6.00 (ticket −0.53 vs dense) | −0.03 | +7.43 ✓ | pending |
+| 6.0 | +6.00 (ticket −0.53 vs dense) | −0.03 | +7.43 ✓ | +5.93 (ticket −1.11 vs dense) |
 
 The reinit was the best baseline in every case except high_warm at 24.2% (shuffle 86.90% vs reinit 86.67%).
 Fig. 1 (`results/figures/fig1_accuracy.png`) shows the curves.
@@ -67,8 +66,9 @@ beats every baseline by 6 pp but sits 0.53 pp below dense, just outside the tole
 
 Frankle & Carbin found no winning tickets at eta = 0.1 even with warmup. **We find winning tickets at 49.1, 24.2 and 12.0% remaining.**
 These are the best accuracies in the study (90.45% at 17.0%), with advantages over reinit of +1.5 to +5.1 pp.
-Below 12% the high_warm tickets fall under dense (−0.33 pp at 8.4%, −1.11 pp at 6.0%). Whether the 6.0% ticket still beats its
-baselines is pending.
+Below 12% the high_warm tickets fall under dense (−0.33 pp at 8.4%, −1.11 pp at 6.0%). At 6.0% the ticket still beats both baselines by
+5.9 pp (88.35% vs reinit 82.42%, shuffle 82.34%), but it sits 1.11 pp below dense, so it is not a winning ticket, like low's 6.0% ticket.
+high_warm wins at 3/4 baseline sparsities. It would pass the low/warm03 Gate A criterion (≥ 3).
 
 **Caveat on what "eta = 0.1 with warmup" means here.** The 10k-step warmup ends at the first LR milestone (`src/train.py::lr_at`).
 The LR rises linearly to 0.1 at step 9,999 and is cut to 0.01 at step 10,000, so **high_warm never trains at a sustained eta = 0.1**.
