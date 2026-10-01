@@ -122,6 +122,21 @@ H2 predicts that where tickets fail, S(t) = eta_t · lambda_max(t) / 3.8 reaches
   falls with sparsity (sparser masks start flatter: lambda_max(theta_0 ⊙ m) is 5.1 at 6.0% vs 25.5 dense). The ticket deficit grows
   as S(0) falls. Seed 1's dense high network *starts* above the limit (S(0) = 1.07, lambda_max 40.6) and trains normally (89.55%).
 
+**Two caveats on the S = 1 threshold, from Kalra & Barkeshli (2024, §4.2 and App. E.2).** Both bear on the verdict above.
+- **The threshold changes over training with momentum.** It is 2/lambda at initialization, when the momentum buffer is still empty,
+  and (2 + 2·beta)/lambda only later. Our S divides by 3.8 throughout, so S(0) and the earliest points are understated by up to 1.9x.
+  Against 2/lambda, dense high starts at eta·lambda/2 = 1.27 (seed 1: 2.03), above the instability threshold. The fall of
+  lambda_max from 25.5 to 6.2 within 25 steps then looks like their *self-stabilization*: training crosses the threshold, sharpness drops
+  sharply, and stability returns. (We see no loss blow-up, only a 1.19x spike, but our loss is checked every 50 steps.)
+  This revives a refined H2 for the *dense* network: no warmup means an early instability-driven sharpness reduction, and warmup avoids it.
+  It does not explain the sparse high tickets, though. Their S(0) against 2/lambda is only 0.25–0.35 at 6–12% remaining, yet they fail the worst.
+- **For minibatch SGD with momentum, the late-time threshold is "much smaller" than (2 + 2·beta)/lambda** and depends on batch size.
+  So "no run comes near S = 1" partly reflects the full-batch threshold we divide by. It is not by itself evidence that training stays far from
+  instability. The plateau at S ≈ 0.03–0.05 that every condition reaches after step 1,000 may be the batch-128 edge of stability.
+  We did not measure that threshold.
+
+These caveats change how the H2 *statistic* should be read, not the data. The comparison between conditions above stands.
+
 Fig. 3 (`fig3_max_s.png`) is the H2 plot; fig. 2 (`fig2_sharpness.png`) has the trajectories.
 
 ## 5. H3 (warmup mechanism): partly supported
@@ -130,7 +145,8 @@ Fig. 3 (`fig3_max_s.png`) is the H2 plot; fig. 2 (`fig2_sharpness.png`) has the 
   high does not.
 - **But the mechanism is not "keeping S below 1".** high never reaches 1 either (§4). The measurable difference is that
   warmup removes the brief S ≈ 0.2–0.5 transient of the first ~200 steps at full LR.
-- **Warmup also lets sharpness grow.** In warm03, lambda_max *rises* during warmup (progressive sharpening, Kalra & Barkeshli 2024),
+- **Warmup also lets sharpness grow.** In warm03, lambda_max *rises* during warmup (progressive sharpening). Kalra & Barkeshli class ResNets in
+  standard parameterization as "natural sharpness reduction" early on, but expect progressive sharpening later, "especially for prolonged warmups". Here,
   from 25.5 to 52.7 at step 2,000. The small LR still holds S ≤ 0.08, and lambda_max then falls to ~4 as the LR grows.
   In high_warm, sharpening stops earlier (peak 36.6 at step 500) and turns down once the LR passes ~0.01.
   In both, the turn-over happens at S ≈ 0.08–0.09, far below 1.
@@ -139,6 +155,9 @@ Fig. 3 (`fig3_max_s.png`) is the H2 plot; fig. 2 (`fig2_sharpness.png`) has the 
 
 **R_0.2 (chance ≈ 0.2), tickets:** low 0.64 → 0.26, warm03 0.56 → 0.21, high_warm 0.33 → 0.20, high 0.25 → 0.22.
 
+- **Liu et al.'s setup**, for comparison (arXiv 2102.11068, §4): ResNet-20 at eta 0.01 vs 0.1, the Frankle hyperparameters but 150 epochs
+  (decay at 80/120); dense accuracy 89.6% (eta 0.01) vs 91.7% (eta 0.1). R_p (their Eq. 1) is pooled over layers, and for tickets it is
+  computed between theta_0 ⊙ m and the trained theta_T ⊙ m, as here. They never test warmup.
 - **The dense pattern agrees with Liu et al.** A large LR decorrelates theta_T from theta_0 (high 0.25, near chance; low 0.64). Warmup keeps part
   of the correlation even at eta = 0.1 (high_warm 0.33).
 - **The sparse tickets contradict a simple "R_p predicts winning" reading.** high_warm wins at 12.0% with R_0.2 = 0.210, and warm03 is
@@ -164,3 +183,17 @@ Fig. 3 (`fig3_max_s.png`) is the H2 plot; fig. 2 (`fig2_sharpness.png`) has the 
 - lambda_max is measured on one fixed 2,048-image batch with 10 Lanczos steps, at 15 points per run. Transients between points are missed.
 - The deviations from the spec (D1 Lanczos, D11 schedule, fp16, the H2 window excluding step 0, the D12 Gate A criterion) are listed
   in `Methodology.md` section 9.
+
+## References (PDFs in `research paper/` on Drive, not in git)
+
+- Frankle & Carbin, ICLR 2019, arXiv 1803.03635v5: ResNet protocol in Sec. 4 and App. I.3–I.5.
+- Liu et al., ICML 2021, arXiv 2102.11068v2: R_p in Eq. 1, ResNet-20 LR comparison in §4.
+- Kalra & Barkeshli, NeurIPS 2024, arXiv 2406.09405v2: warmup mechanisms in §4, SGD-M thresholds in §4.2 and App. E.2.
+- Cohen et al., ICLR 2021, arXiv 2103.00065v3: edge of stability.
+- Foret et al., ICLR 2021, arXiv 2010.01412v3: SAM (H4).
+- Frankle et al., ICML 2020, arXiv 1912.05671v4: linear mode connectivity.
+- Paul et al., ICLR 2023, arXiv 2210.03044v1: what an IMP mask encodes.
+- Sakamoto & Sato, NeurIPS 2022, arXiv 2205.07320v3: PAC-Bayes view of LTH.
+- Lange & Sprekeler, ICML 2023, arXiv 2306.00045v1: ES lottery tickets.
+- McDermott & Parhi 2025, arXiv 2503.17905v1: stable subnetworks at init via dataset distillation.
+
