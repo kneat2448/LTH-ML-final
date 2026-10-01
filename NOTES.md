@@ -548,3 +548,8 @@ Reminders:
     (ticket − shuffle ≥ +2.0 pp at ≥ 2 of 3 masks, plus a manipulation check), **awaiting user approval before results land (≈ 07:25 start)**.
     Methodology §7 D6 wording fixed to match the code (smallest lam reaching the target, else max R_0.2). Anchor target R_0.2 = 0.661 (low r3, step 3k).
   - **06:00 UTC: D13 (user): H4 rescue rule approved** (≥ +2.0 pp ticket − shuffle at ≥ 2/3 masks + manipulation check). In H4.md §5 and Methodology §9.
+  - **06:24 UTC hourly check:** all processes alive, GPU 100%. Seed 1 25/45 (low 12, high 12, warm03 1). Runtime 18.4 h.
+    r7 (8.4%) tickets vs dense: low 87.16% (+0.68; seed 0 +0.51), high 84.38% (−5.17; seed 0 −5.58). **warm03 s1 dense 87.81%** (seed 0 87.48%), max S 0.053.
+    Forecast unchanged: low/high s1 ≈ 07:25, H4 then starts; all done ≈ 12:30 UTC.
+  - **06:45 UTC: H2/H3 write-up drafted** (`results/H2_H3.md`), s0+s1 data. H2: not supported as stated (no run > 0.54; within-condition ρ ≈ 0; S(0) anti-predictive in high, ρ +0.86, confounded with sparsity);
+    condition-level separation holds (high 0.16–0.54 vs ≤ 0.15 elsewhere, max at step 25 in 15/18 high tickets). H3: partly supported. Fixed a wrong PHASE_A.md claim: early losses are logged per step (first 200), and dense high s0 r0/r1 show a step-4 catapult (1.44x/1.51x the running min).
