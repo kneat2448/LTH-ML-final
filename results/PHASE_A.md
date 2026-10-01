@@ -95,7 +95,7 @@ Its LR passes 0.03 only after step 3,000, and its mean LR over the first 10k ste
 - **Initialization.** Kaiming normal (`src/models.py`) vs their Gaussian Glorot. Glorot gives smaller conv weights for these fan-ins.
   That changes lambda_max at theta_0 and the early dynamics, which is exactly what H2 is about.
 - **Shortcuts.** Option-A (zero-pad) shortcuts here. They mention 2,560 downsampling parameters, so they used projection shortcuts.
-- **Seeds.** One seed here; Frankle report averages of five trials. We do not know which k they tried at 0.1.
+- **Seeds.** One seed here. Frankle average over several trials (five for the Conv/Lenet figures; the count for ResNet is not stated). We do not know which k they tried at 0.1.
 
 Report it as a disagreement with Frankle, with these differences listed, and not as a refutation.
 
