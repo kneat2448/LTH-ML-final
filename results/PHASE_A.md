@@ -72,13 +72,30 @@ baselines is pending.
 
 **Caveat on what "eta = 0.1 with warmup" means here.** The 10k-step warmup ends at the first LR milestone (`src/train.py::lr_at`).
 The LR rises linearly to 0.1 at step 9,999 and is cut to 0.01 at step 10,000, so **high_warm never trains at a sustained eta = 0.1**.
-Its LR passes 0.03 only after step 3,000, and its mean LR over the first 10k steps is 0.05. This is not a difference from Frankle:
-warm03 is Frankle's ResNet setting rescaled from 30k to 15k iterations, and (to be checked against the paper's appendix) there too
-the warmup ends at the first decay. So the schedule does not explain the disagreement. Possible causes, none tested:
-- half the iterations, so the ramp to 0.1 is twice as steep in steps;
-- 30% vs 20% pruning per round;
-- one seed (seed 1 of high_warm is not in the plan);
-- the definition of "winning" (we compare with trained baselines at the same mask; Frankle mainly compares with dense).
+Its LR passes 0.03 only after step 3,000, and its mean LR over the first 10k steps is 0.05.
+
+**Frankle & Carbin's ResNet protocol (checked in arXiv 1803.03635v5, Sec. 4 and App. I.3–I.5).**
+- **Schedule.** 30k iterations in three stages of 20k, 5k and 5k (LR ÷10 at 20k and 25k), batch 128, momentum 0.9, weight decay 1e-4.
+  Warmup is linear from 0 to the target LR over k iterations.
+- **Warmup ends at the first decay in their setting too.** Their successful ResNet setting is eta = 0.03 with k = 20,000, so warmup also ends
+  at the first decay (20k). warm03 (10k of 15k) is the same schedule shape compressed 2x, and so is high_warm at eta = 0.1. The
+  "never at a sustained high LR" caveat therefore applies equally to Frankle's warmup runs. It is not a difference between the studies.
+- **Their eta = 0.1 + warmup result for ResNet is a single sentence, with no figure.** "Even with warmup, however, we could not find
+  hyperparameters for which we could identify winning tickets at the original learning rate, 0.1" (Sec. 4). App. I.5: "warmup made it
+  possible to increase the learning rate from 0.01 to 0.03, but no further". The warmup-length sweep (Fig. 44: k ∈ {0, 0.5k, 1k, 5k, 10k, 20k})
+  is shown only at eta = 0.03. The k values tried at 0.1 are not reported.
+- **For VGG-19, warmup does rescue eta = 0.1** (k = 10,000, Fig. 7 / Fig. 45; 112k-iteration schedule, so there warmup ends long before the decay).
+- **Their winning-ticket criterion** is matching the accuracy of the unpruned network (Sec. 1) in at most the same number of iterations.
+  Ours also requires beating trained baselines at the same mask (Methodology section 6). By their criterion alone, high_warm still has
+  winning tickets from 70.1% to 12.0% (+0.26 to +0.99 pp vs dense).
+
+**Differences that could explain the disagreement** (none tested):
+- **Half the iterations.** 15k vs 30k, so the ramp to 0.1 is twice as steep per step (10k vs, for a 20k warmup, 20k steps).
+- **Pruning rate.** 30% vs 20% per round. Also, they do not prune the output layer; we prune it at half the rate.
+- **Initialization.** Kaiming normal (`src/models.py`) vs their Gaussian Glorot. Glorot gives smaller conv weights for these fan-ins.
+  That changes lambda_max at theta_0 and the early dynamics, which is exactly what H2 is about.
+- **Shortcuts.** Option-A (zero-pad) shortcuts here. They mention 2,560 downsampling parameters, so they used projection shortcuts.
+- **Seeds.** One seed here; Frankle report averages of five trials. We do not know which k they tried at 0.1.
 
 Report it as a disagreement with Frankle, with these differences listed, and not as a refutation.
 
@@ -143,7 +160,7 @@ Fig. 3 (`fig3_max_s.png`) is the H2 plot; fig. 2 (`fig2_sharpness.png`) has the 
 
 - One seed per condition. Seed 1 covers low/high/warm03 only.
 - 15k iterations (half of Frankle's 30k), 30% pruning per round (Frankle 20%), no rewinding.
-- high_warm's warmup ends at the LR decay, so it never trains at a sustained eta = 0.1 (§3; same structure as Frankle's warmup).
+- high_warm's warmup ends at the LR decay, so it never trains at a sustained eta = 0.1 (§3; Frankle's eta = 0.03, k = 20k warmup has the same structure).
 - lambda_max is measured on one fixed 2,048-image batch with 10 Lanczos steps, at 15 points per run. Transients between points are missed.
 - The deviations from the spec (D1 Lanczos, D11 schedule, fp16, the H2 window excluding step 0, the D12 Gate A criterion) are listed
   in `Methodology.md` section 9.
