@@ -222,6 +222,7 @@ to 10k before any condition or seed is cut.
 | low | 1 | 5 | 17.0 | ticket | 87.91% | 0.040 | 0.062 | 0.356 | no |
 | low | 1 | 6 | 12.0 | reinit | 82.69% | 0.023 | 0.070 | 0.351 | no |
 | low | 1 | 6 | 12.0 | ticket | 87.39% | 0.032 | 0.060 | 0.316 | no |
+| low | 1 | 7 | 8.4 | ticket | 87.16% | 0.031 | 0.065 | 0.293 | no |
 | high | 0 | 0 | 100.0 | ticket (dense) | 89.83% | 0.670 | 0.226 | 0.247 | no |
 | high | 0 | 1 | 70.1 | ticket | 89.39% | 0.638 | 0.536 | 0.238 | no |
 | high | 0 | 2 | 49.1 | reinit | 88.85% | 0.817 | 0.334 | 0.228 | no |
@@ -263,6 +264,7 @@ to 10k before any condition or seed is cut.
 | warm03 | 0 | 8 | 6.0 | reinit | 80.43% | 0.000 | 0.069 | 0.272 | no |
 | warm03 | 0 | 8 | 6.0 | shuffle | 80.26% | 0.000 | 0.065 | 0.299 | no |
 | warm03 | 0 | 8 | 6.0 | ticket | 87.86% | 0.000 | 0.039 | 0.214 | no |
+| warm03 | 1 | 0 | 100.0 | ticket (dense) | 87.81% | 0.000 | 0.053 | 0.561 | no |
 | high_warm | 0 | 0 | 100.0 | ticket (dense) | 89.46% | 0.000 | 0.092 | 0.331 | no |
 | high_warm | 0 | 1 | 70.1 | ticket | 90.10% | 0.000 | 0.069 | 0.306 | no |
 | high_warm | 0 | 2 | 49.1 | reinit | 88.28% | 0.000 | 0.071 | 0.285 | no |
