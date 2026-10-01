@@ -58,9 +58,11 @@ beats every baseline by 6 pp but sits 0.53 pp below dense, just outside the tole
   We judged high's three small positive advantages (+0.36, +0.13, +0.39 pp) by the winning-ticket definition, not the sign alone (D12, a deviation to report).
   They come with tickets 0.6–4.3 pp below dense and are within the scale of seed noise.
   The dense high network is the most accurate dense network (89.83%), so this is not a weak baseline.
-- **Seed 1 so far agrees** (low and high, rounds 0–5). The seed-1 dense accuracies are within 0.3 pp of seed 0 (low 86.48%, high 89.55%).
-  low tickets are +0.63 to +1.64 pp vs dense, with advantages of +2.11 (49.1%) and +3.64 pp (24.2%). high tickets are −0.32 to −3.21 pp vs dense,
-  with advantages of +0.15 and +0.07 pp. Error bars for the final report come from the two seeds.
+- **Seed 1 agrees** (low and high complete, 07:16 UTC). The seed-1 dense accuracies are within 0.3 pp of seed 0 (low 86.48%, high 89.55%).
+  - **low** advantages are +2.11, +3.64, +4.70 and +6.55 pp at 49.1, 24.2, 12.0 and 6.0% (seed 0: +2.07, +3.28, +4.54, +6.00), and the 6.0% ticket is
+    within tolerance this time (−0.26 pp vs dense).
+  - **high** advantages are +0.15, +0.07, +0.67 and +0.43 pp, with tickets −1.02 to −7.19 pp vs dense: no winning ticket on either seed.
+  - With two seeds, Gate A still passes (`results/gate_a.md`: low 4/4 with mean > 2 SE, high 0/4 winning).
 
 ## 3. high_warm: winning tickets at eta = 0.1, against Frankle
 

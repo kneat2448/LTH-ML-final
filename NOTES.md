@@ -553,3 +553,5 @@ Reminders:
     Forecast unchanged: low/high s1 ≈ 07:25, H4 then starts; all done ≈ 12:30 UTC.
   - **06:45 UTC: H2/H3 write-up drafted** (`results/H2_H3.md`), s0+s1 data. H2: not supported as stated (no run > 0.54; within-condition ρ ≈ 0; S(0) anti-predictive in high, ρ +0.86, confounded with sparsity);
     condition-level separation holds (high 0.16–0.54 vs ≤ 0.15 elsewhere, max at step 25 in 15/18 high tickets). H3: partly supported. Fixed a wrong PHASE_A.md claim: early losses are logged per step (first 200), and dense high s0 r0/r1 show a step-4 catapult (1.44x/1.51x the running min).
+  - **07:17 UTC: low and high seed 1 complete (15/15 each); H4 started.** Seed 1 r8 (6.0%): low ticket 86.22% (−0.26 vs dense, adv +6.55 → winning), high 82.36% (−7.19, adv +0.43).
+    Two-seed Gate A still PASSED. H4: queue A running `h4_high_anchor --select-lam` (07:12), queue B `h4_high_sam` (07:17); warm03 s1 running. H2_H3.md and PHASE_A.md updated with the final s1 low/high numbers.

@@ -32,3 +32,4 @@ COST ESTIMATE high: 9 trainings x 7.8 min = 1.17 h runtime on Tesla T4; used so 
 [high seed1 r8 reinit] mode=plain remaining=0.0597
    acc=0.8164 f1=0.8156 R02=0.224 maxS3k=0.239 diverged=False wall=24.4min sharp_overhead=71.5% peakVRAM=2460MB
 [high seed1 r8 shuffle] mode=plain remaining=0.0597
+   acc=0.8193 f1=0.8190 R02=0.224 maxS3k=0.352 diverged=False wall=24.1min sharp_overhead=78.2% peakVRAM=2460MB
