@@ -555,3 +555,4 @@ Reminders:
     condition-level separation holds (high 0.16–0.54 vs ≤ 0.15 elsewhere, max at step 25 in 15/18 high tickets). H3: partly supported. Fixed a wrong PHASE_A.md claim: early losses are logged per step (first 200), and dense high s0 r0/r1 show a step-4 catapult (1.44x/1.51x the running min).
   - **07:17 UTC: low and high seed 1 complete (15/15 each); H4 started.** Seed 1 r8 (6.0%): low ticket 86.22% (−0.26 vs dense, adv +6.55 → winning), high 82.36% (−7.19, adv +0.43).
     Two-seed Gate A still PASSED. H4: queue A running `h4_high_anchor --select-lam` (07:12), queue B `h4_high_sam` (07:17); warm03 s1 running. H2_H3.md and PHASE_A.md updated with the final s1 low/high numbers.
+  - **07:24 UTC hourly check:** warm03 s1 4/15, H4 lam selection (lam 1e-3 run) and SAM r3 ticket running, GPU 100%, runtime 19.8 h. Forecast ≈ 12:30 UTC.

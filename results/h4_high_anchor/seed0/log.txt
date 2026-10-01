@@ -1,0 +1,2 @@
+COST ESTIMATE h4_high_anchor: 6 trainings x 8.1 min = 0.81 h runtime on Tesla T4; used so far 19.94 / 30 h
+[h4_high_anchor seed0 r3 ticket] mode=anchor remaining=0.3447
