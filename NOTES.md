@@ -8,6 +8,14 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ## 1. Current status (2026-09-29, session 4, Colab T4)
 
+- **SESSION 6 (2026-10-01, from 03:32 UTC): recovered from the VM loss (≈ 10:00 UTC 09-30) and relaunched everything; H4 is queued.**
+  Status at 03:32: Phase A 55/60 (high_warm: r6 reinit, r7 ticket, r8 ticket/reinit/shuffle left), seed 1 12/45 (low 6, high 6, warm03 0), H4 0/18.
+  Running under MPS: high_warm s0, low s1, high s1; `resume_phaseB.sh warm03` waits for high_warm. **H4 queue (`colab/queue_h4.sh`)**: slot A waits
+  for low s1, then `h4_high_anchor --select-lam` → `h4_high_anchor` → `h4_high`; slot B waits for high s1, then `h4_high_sam`.
+  Forecast: high_warm ≈ 05:40, low/high s1 ≈ 07:15, warm03 s1 ≈ 11:40, H4 ≈ 12:00–12:30 UTC → **all runs done ≈ 12:30 UTC (≈ 9 h wall)**.
+  **Restart after a VM reset:** `bash colab/resume_phaseA.sh high_warm; bash colab/resume_phaseB.sh low high` (or `warm03` once high_warm is done),
+  then the two `queue_h4.sh` lines from the section 9 log (they start at once if the seed-1 chain is not running).
+  Budget not re-calibrated yet (logged 15.39 h excludes idle time after the reset; read the remaining hours from the Colab usage page).
 - **SESSION 5 (2026-09-30, from 04:38 UTC): Phase A resumed; 52/60 done at 07:25 UTC (only high_warm left), Gate A final: PASSED; seed 1 running.** high, warm03 and high_warm run under MPS
   with the watcher. Left: warm03 1 (r8 shuffle), high_warm 12. high is complete. **Phase B seed 1 (low, high) starts when warm03 exits (≈ 06:20), warm03 seed 1 when
   high_warm exits**; high_warm then ends ≈ 10:45 UTC, seed 1 ≈ 13:30–14:00 UTC. Restart after a VM reset: `bash colab/resume_phaseA.sh high_warm; bash colab/resume_phaseB.sh`.
@@ -509,3 +517,14 @@ Reminders:
     `RUNTIME_SINCE = 2026-09-30T09:30:30`. The reset cost ≈ 1.6 h beyond the logged 13.41 h. The chains running now use the old constants in
     their COST ESTIMATE lines. Plan: seed 1 ≈ 6.5 h wall (done ≈ 16:00) + H4 ≈ 3 h → ≈ 9.5 h, leaving ≈ 5.5 h reserve. Start H4 in any GPU slot
     that frees up (low/high s1 end ≈ 13:30, while warm03 s1 still runs) so the GPU never runs fewer than 3 chains.
+- **2026-10-01, session 6 (Colab T4).**
+  - **03:32 UTC:** new VM, nothing running. The 09-30 VM died after the 09:59 autosave (git was clean; every finished result was committed).
+    Lost in progress: high_warm r6 reinit, low s1 r4 reinit, high s1 r4 reinit. Relaunched: `bash colab/resume_phaseA.sh high_warm`,
+    `bash colab/resume_phaseB.sh low high`, `WAIT_FOR=high_warm nohup bash colab/resume_phaseB.sh warm03 >> /content/phaseB_launch.out 2>&1 &`.
+    GPU 3 chains, 7.6 GB.
+  - **H4 queued** with the new `colab/queue_h4.sh` (fills a GPU slot as soon as a seed-1 chain exits):
+    `nohup bash colab/queue_h4.sh low "configs/h4_high_anchor.yaml --select-lam" configs/h4_high_anchor.yaml configs/h4_high.yaml >> /content/h4_queue_A.out 2>&1 &`
+    and `nohup bash colab/queue_h4.sh high configs/h4_high_sam.yaml >> /content/h4_queue_B.out 2>&1 &`. Masks/theta_0 from `checkpoints/warm03/seed0` (present).
+    `colab/watcher.sh` now labels H4 commits `H4` (was "Phase A" for any seed0 dir); watcher restarted.
+  - Remaining: 5 + 33 + 18 H4 (SAM ≈ 2x) ≈ 62 training-equivalents at ≈ 6.5/h → done ≈ 12:30 UTC, ≈ 9 h runtime.
+

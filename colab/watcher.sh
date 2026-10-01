@@ -37,7 +37,7 @@ while true; do
   for f in $(git ls-files --others --exclude-standard 'results/*/seed*/round*.json' 2>/dev/null); do
     sleep 20  # let the chain finish writing log/compute_log
     cond=$(echo $f | cut -d/ -f2); seed=$(echo $f | cut -d/ -f3); base=$(basename $f .json)
-    phase="Phase A"; [ "$seed" != seed0 ] && phase="Phase B ($seed)"
+    phase="Phase A"; [ "$seed" != seed0 ] && phase="Phase B ($seed)"; [[ $cond == h4_* ]] && phase="H4"
     msg=$(python - "$f" <<'PY'
 import json,sys
 from src.metrics import stability_summary
