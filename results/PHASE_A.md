@@ -129,7 +129,7 @@ H2 predicts that where tickets fail, S(t) = eta_t · lambda_max(t) / 3.8 reaches
   lambda_max from 25.5 to 6.2 within 25 steps then looks like their *self-stabilization*: training crosses the threshold, sharpness drops
   sharply, and stability returns. (We see no loss blow-up, only a 1.19x spike, but our loss is checked every 50 steps.)
   This revives a refined H2 for the *dense* network: no warmup means an early instability-driven sharpness reduction, and warmup avoids it.
-  It does not explain the sparse high tickets, though. Their S(0) against 2/lambda is only 0.25–0.35 at 6–12% remaining, yet they fail the worst.
+  It does not explain the sparse high tickets, though. Their S(0) against 2/lambda is only 0.25–0.36 at 6–12% remaining, yet they fail the worst.
 - **For minibatch SGD with momentum, the late-time threshold is "much smaller" than (2 + 2·beta)/lambda** and depends on batch size.
   So "no run comes near S = 1" partly reflects the full-batch threshold we divide by. It is not by itself evidence that training stays far from
   instability. The plateau at S ≈ 0.03–0.05 that every condition reaches after step 1,000 may be the batch-128 edge of stability.

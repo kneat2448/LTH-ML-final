@@ -529,7 +529,7 @@ Reminders:
     `colab/watcher.sh` now labels H4 commits `H4` (was "Phase A" for any seed0 dir); watcher restarted.
   - Remaining: 5 + 33 + 18 H4 (SAM ≈ 2x) ≈ 62 training-equivalents at ≈ 6.5/h → done ≈ 12:30 UTC, ≈ 9 h runtime.
   - **03:37 UTC: budget re-calibrated (user): 14 h left** → `RUNTIME_USED_BEFORE_H = 16.0`, `RUNTIME_SINCE = 2026-10-01T03:37:00`. Remaining plan ≈ 9 h, reserve ≈ 5 h.
-  - **05:20 UTC: papers fetched from arXiv** into `research paper/` on Drive (gitignored, as on the laptop): Frankle & Carbin 2019,
+  - **05:13 UTC: papers fetched from arXiv** into `research paper/` on Drive (gitignored, as on the laptop): Frankle & Carbin 2019,
     Liu 2021, Kalra & Barkeshli 2024, Cohen 2021 (EoS), Foret 2021 (SAM), Frankle 2020 (LMC), Paul 2023, Sakamoto & Sato 2022,
     Lange & Sprekeler 2023, McDermott & Parhi 2025. IDs in `results/PHASE_A.md` (References). Draft Phase A write-up: `results/PHASE_A.md`.
     Checked facts: Frankle's ResNet warmup (eta 0.03, k = 20k of 30k) also ends at the first decay; the eta 0.1 + warmup failure is one
