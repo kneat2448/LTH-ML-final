@@ -30,3 +30,5 @@ COST ESTIMATE high_warm: 5 trainings x 7.8 min = 0.65 h runtime on Tesla T4; use
 [high_warm seed0 r7 ticket] mode=warmup remaining=0.0844
    acc=0.8913 f1=0.8913 R02=0.210 maxS3k=0.052 diverged=False wall=24.0min sharp_overhead=98.3% peakVRAM=2460MB
 [high_warm seed0 r8 ticket] mode=warmup remaining=0.0597
+   acc=0.8835 f1=0.8835 R02=0.201 maxS3k=0.081 diverged=False wall=23.8min sharp_overhead=80.8% peakVRAM=2460MB
+[high_warm seed0 r8 reinit] mode=warmup remaining=0.0597
