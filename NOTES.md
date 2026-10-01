@@ -213,6 +213,9 @@ python -m analysis.plots                                              # summary.
   not any positive advantage. Reason: high had two tiny positive advantages (+0.36 pp at 49.1%, +0.13 pp at 24.2%) while its tickets
   were 0.62 and 2.55 pp below dense. The low/warm03 criterion is unchanged (advantage > 0 at ≥ 3 sparsities). `analysis/plots.py::gate_a`
   now also lists high's positive-but-not-winning points in `gate_a.md`. State this in the report.
+- **D13. H4 rescue rule (session 6, user decision, 06:00 UTC, before any H4 result):** ticket − shuffle advantage ≥ +2.0 pp at
+  ≥ 2 of the 3 warm03 masks, plus a manipulation check (SAM lowers max S(25–3k) vs plain; anchor raises R_0.2 at 3k vs plain), else
+  "inconclusive". Calibration: high chain ≤ +0.7 pp everywhere; warm03 smallest win +1.91 pp. `results/H4.md` §5.
 - **D10.** Conv-4 / Fashion-MNIST chain (`conv4_fmnist_high.yaml`): 3k iterations, 60%/round, 5 rounds (pilot rates),
   55k/5k train/val split, no augmentation.
 
@@ -544,3 +547,4 @@ Reminders:
   - **05:55 UTC: H4 write-up drafted before any H4 result** (`results/H4.md`): design, predictions, a *proposed* rescue rule
     (ticket − shuffle ≥ +2.0 pp at ≥ 2 of 3 masks, plus a manipulation check), **awaiting user approval before results land (≈ 07:25 start)**.
     Methodology §7 D6 wording fixed to match the code (smallest lam reaching the target, else max R_0.2). Anchor target R_0.2 = 0.661 (low r3, step 3k).
+  - **06:00 UTC: D13 (user): H4 rescue rule approved** (≥ +2.0 pp ticket − shuffle at ≥ 2/3 masks + manipulation check). In H4.md §5 and Methodology §9.

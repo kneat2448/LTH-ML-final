@@ -183,6 +183,9 @@ to 10k before any condition or seed is cut.
 - **Gate A criterion for `high` (D12, user decision).** "Tickets do not beat baselines at high LR" is judged with the section-5
   winning-ticket definition: advantage > 0 **and** ticket acc ≥ dense − 0.5 pp. Any positive advantage alone does not count.
   high's two positive advantages (+0.36, +0.13 pp) came with tickets 0.62 and 2.55 pp below dense.
+- **H4 rescue rule (D13, user decision, fixed before any H4 result).** A condition rescues the ticket if its ticket − shuffle advantage is
+  ≥ +2.0 pp at ≥ 2 of the 3 masks. It also needs a manipulation check: SAM must lower max S(25–3k), and the anchor must raise R_0.2 at step 3k,
+  relative to (a). Otherwise the verdict is "inconclusive". See `results/H4.md` §5.
 - **Pilot re-interpretation:** P1 is reversed (dense eta = 0.1 collapses in 2 of 3 short runs), P3 is weakened
   (seed-dependent), and P2 is unverified (likely the D1 artifact). See `pilot_results/PILOT_FINDINGS.md`.
 
