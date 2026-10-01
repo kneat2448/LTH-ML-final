@@ -128,7 +128,8 @@ collapse rather than a systematic ticket deficit (F1, F2).
 
 1. Masks: the warm03 chain's masks at 34.3%, 11.8% and 5.8% remaining (rounds 3, 6 and 8).
 2. Anchor lam: for each lam in {1e-3, 1e-2}, run 3k steps at the round-3 mask. Pick the lam whose
-   R_0.2 at step 3,000 comes closest to the `low` ticket's R_0.2 at the same step (D6).
+   R_0.2 at step 3,000 reaches the `low` ticket's R_0.2 at the same step: the smallest such lam, or, if none reaches it, the lam with
+   the highest R_0.2 (D6; `src/fixed_mask.py::select_lam`, which records `reached_target`).
    Command: `python -m src.fixed_mask configs/h4_high_anchor.yaml --select-lam`.
 3. Train ticket + shuffle at each mask under `high`, `high_sam` and `high_anchor` (18 trainings).
 4. Compare ticket advantage, max S and R_0.2 against warm03 (fig. 5).
