@@ -213,6 +213,7 @@ to 10k before any condition or seed is cut.
 | low | 1 | 2 | 49.1 | ticket | 87.91% | 0.066 | 0.067 | 0.532 | no |
 | low | 1 | 3 | 34.5 | ticket | 88.12% | 0.060 | 0.076 | 0.465 | no |
 | low | 1 | 4 | 24.2 | reinit | 84.41% | 0.047 | 0.113 | 0.449 | no |
+| low | 1 | 4 | 24.2 | shuffle | 83.22% | 0.057 | 0.095 | 0.459 | no |
 | low | 1 | 4 | 24.2 | ticket | 88.05% | 0.045 | 0.068 | 0.409 | no |
 | high | 0 | 0 | 100.0 | ticket (dense) | 89.83% | 0.670 | 0.226 | 0.247 | no |
 | high | 0 | 1 | 70.1 | ticket | 89.39% | 0.638 | 0.536 | 0.238 | no |
@@ -262,6 +263,7 @@ to 10k before any condition or seed is cut.
 | high_warm | 0 | 5 | 17.0 | ticket | 90.45% | 0.000 | 0.057 | 0.230 | no |
 | high_warm | 0 | 6 | 12.0 | reinit | 84.61% | 0.000 | 0.077 | 0.243 | no |
 | high_warm | 0 | 6 | 12.0 | ticket | 89.72% | 0.000 | 0.066 | 0.210 | no |
+| high_warm | 0 | 7 | 8.4 | ticket | 89.13% | 0.000 | 0.052 | 0.210 | no |
 <!-- results-table:end -->
 
 **Observations so far (seed 0, single runs, directional only):**
