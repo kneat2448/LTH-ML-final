@@ -2,3 +2,5 @@ COST ESTIMATE h4_high_sam: 6 trainings x 16.2 min = 1.62 h runtime on Tesla T4; 
 [h4_high_sam seed0 r3 ticket] mode=sam remaining=0.3447
    acc=0.8929 f1=0.8927 R02=0.200 maxS3k=0.695 diverged=False wall=41.7min sharp_overhead=37.5% peakVRAM=2460MB
 [h4_high_sam seed0 r3 shuffle] mode=sam remaining=0.3447
+COST ESTIMATE h4_high_sam: 5 trainings x 16.0 min = 1.33 h runtime on Tesla T4; used so far 20.40 / 30 h
+[h4_high_sam seed0 r3 shuffle] mode=sam remaining=0.3447
