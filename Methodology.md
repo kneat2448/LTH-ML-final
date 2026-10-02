@@ -142,12 +142,12 @@ collapse rather than a systematic ticket deficit (F1, F2).
 | 1 | Code + tests (23 tests pass on the T4) | **done** |
 | 2 | Benchmark / smoke run on the T4: ~9 min per 15k training, 2.46 GB peak VRAM; budget re-derived | **done** (session 2) |
 | 3a | Phase A: `low` seed 0 (15 trainings) | **done** (session 4, 09:05 UTC) |
-| 3b | Phase A: `high`, `warm03` seed 0 (15 each), in parallel with `low` under MPS | high **15/15, done** (05:53 UTC, session 5); warm03 **14/15** (r8 shuffle running) |
-| 3b' | Phase A: `high_warm` seed 0 (15) | **8/15** at 07:25 UTC (session 5), in parallel with the seed-1 chains |
+| 3b | Phase A: `high`, `warm03` seed 0 (15 each), in parallel with `low` under MPS | **done** (session 5) |
+| 3b' | Phase A: `high_warm` seed 0 (15) | **done** (2026-10-01, 05:55 UTC) |
 | 3c | Conv-4 chain at eta = 0.1 with the full S(t) trajectory | optional; needs `pilot/data/*.gz` on Drive (O8) |
 | 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | **PASSED on seed 0, final for the three gate conditions** (low 4/4, warm03 4/4, high 0/4 winning tickets, D12) |
-| 5 | Phase B: seed 1 of `low`, `high` and `warm03` (error bars) | **running** (session 5): low s1 2/15, high s1 3/15 at 07:25 UTC; warm03 s1 starts when high_warm ends |
-| 6 | Phase B: H4 (lam selection, then 3 conditions × 3 masks × ticket + shuffle) | pending |
+| 5 | Phase B: seed 1 of `low`, `high` and `warm03` (error bars) | **done** (low/high 2026-10-01 07:17 UTC, warm03 2026-10-02 15:15 UTC) |
+| 6 | Phase B: H4 (lam selection, then 3 conditions × 3 masks × ticket + shuffle) | **done** (2026-10-02 15:39 UTC); lam = 0.01; `results/H4.md` §6–7, `results/h4_results.md` |
 | 7 | Analysis: `python -m analysis.plots` → summary.csv, figs 1–5, metrics table, gate_a.md | script ready; re-run every 15 min by the autosave |
 | 8 | `results/FINDINGS.md`: verdict + numbers for H1–H4; final report | pending |
 

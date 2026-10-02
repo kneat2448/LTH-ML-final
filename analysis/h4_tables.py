@@ -61,8 +61,12 @@ def verdict(d: dict, k: str) -> str:
         return f"{rule} by the rule ({n_pass}/{n_done}); manipulation check pending (needs (a))"
     moved = sum((x < y) if want == "lower" else (x > y) for x, y in pairs)
     ok = moved > len(pairs) / 2
-    return (f"{rule if ok else 'inconclusive'} ({n_pass}/{n_done} masks ≥ +{RESCUE_PP} pp; "
-            f"{key} {want} than (a) at {moved}/{len(pairs)} masks)")
+    out = (f"{rule if ok else 'inconclusive'} ({n_pass}/{n_done} masks ≥ +{RESCUE_PP} pp; "
+           f"{key} {want} than (a) at {moved}/{len(pairs)} masks)")
+    a_advs = [advantage(d, "a", r) for r in ROUNDS]
+    if sum(a is not None and a >= RESCUE_PP for a in a_advs) >= RESCUE_MASKS:
+        out += "; but (a) already meets the rule, so there is no failure to rescue (H4.md §4: (b) and (c) are secondary)"
+    return out
 
 
 def main() -> None:

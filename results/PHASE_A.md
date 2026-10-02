@@ -1,7 +1,7 @@
 # Phase A write-up (seed 0): draft
 
-*Status: draft of 2026-10-01, 05:55 UTC. **Phase A is complete (60/60).** Seed 1 (Phase B) is running, so every number here is a **single run**. Treat
-differences under ~0.5 pp as noise until seed 1 is in. All numbers come from `results/summary.csv`
+*Status: draft of 2026-10-01, 05:55 UTC; seed-1 notes added through 2026-10-02. **Phase A is complete (60/60), and so is seed 1 (low, high, warm03).** The tables
+are seed 0; the two-seed comparison is in §2 ("Seed 1 agrees"). H4 results: `results/H4.md` §6–7. All numbers come from `results/summary.csv`
 (`python -m analysis.plots`); the per-run table is in `Methodology.md` section 10. Setup and definitions: `Methodology.md` sections 3–6.*
 
 ## 1. What Phase A ran
@@ -61,6 +61,8 @@ beats every baseline by 6 pp but sits 0.53 pp below dense, just outside the tole
 - **Seed 1 agrees** (low and high complete, 07:16 UTC). The seed-1 dense accuracies are within 0.3 pp of seed 0 (low 86.48%, high 89.55%).
   - **low** advantages are +2.11, +3.64, +4.70 and +6.55 pp at 49.1, 24.2, 12.0 and 6.0% (seed 0: +2.07, +3.28, +4.54, +6.00), and the 6.0% ticket is
     within tolerance this time (−0.26 pp vs dense).
+  - **warm03** (complete 10-02, 15:15 UTC; dense 87.81%) advantages are +2.03, +3.56, +4.77 and +5.43 pp (seed 0: +1.91, +3.87, +4.89, +7.43).
+    The 6.0% ticket is 0.80 pp below dense this time, so warm03 wins at 3/4 on seed 1 by the strict definition and 4/4 on the two-seed means.
   - **high** advantages are +0.15, +0.07, +0.67 and +0.43 pp, with tickets −1.02 to −7.19 pp vs dense: no winning ticket on either seed.
   - With two seeds, Gate A still passes (`results/gate_a.md`: low 4/4 with mean > 2 SE, high 0/4 winning).
 
@@ -172,9 +174,11 @@ Fig. 3 (`fig3_max_s.png`) is the H2 plot; fig. 2 (`fig2_sharpness.png`) has the 
 ## 7. Open questions handed to Phase B
 
 1. **Error bars.** Do the high advantages (+0.1 to +0.4 pp) and the high_warm wins hold on seed 1? (Seed 1 of high_warm is not in the plan.)
+   *Answered for high (yes: +0.07 to +0.67 pp, none winning) and for low/warm03 (§2).*
 2. **H4 decides between the two readings in §4 and §6.** Train warm03's masks at eta = 0.1 (a) plain, (b) with SAM, which lowers sharpness, and
    (c) with an L2 anchor to theta_0, which raises R_p. If SAM rescues the ticket and the anchor does not, that supports sharpness, in the weak
    "early transient" form of §4.
+   *Answered (`results/H4.md` §7): neither. warm03's masks win at eta = 0.1 without any intervention, so high's failure lies in the masks IMP finds.*
 3. **The first 200 steps are under-sampled** (4 points). If H4 points to sharpness, a denser early schedule on a few runs is the
    cheapest follow-up. Any such follow-up needs budget approval.
 

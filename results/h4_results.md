@@ -6,7 +6,7 @@ Test accuracy %, ticket / shuffle / advantage (pp).
 |---|---|---|---|
 | 34.5% | 89.27 / 88.38 / +0.89 | 89.29 / 88.14 / +1.15 | 85.64 / 78.01 / +7.63 |
 | 12.0% | 88.91 / 85.32 / +3.59 | 88.86 / 85.64 / +3.22 | 86.19 / 75.36 / +10.83 |
-| 6.0% | 87.24 / — / — | 87.50 / 82.24 / +5.26 | 84.44 / 72.12 / +12.32 |
+| 6.0% | 87.24 / 82.44 / +4.80 | 87.50 / 82.24 / +5.26 | 84.44 / 72.12 / +12.32 |
 
 Tickets: max S(25–3k) / S(0) / R_0.2 at 3k / R_0.2 final, for (a) | (b) | (c).
 
@@ -20,6 +20,6 @@ Anchor lam chosen: 0.01 (R_0.2 at 3k: lam 0.001 → 0.479, lam 0.01 → 0.757; t
 
 ## Verdicts (D13)
 
-- **(a) h4_high**: pending (1/2 masks ≥ +2.0 pp so far)
-- **(b) h4_high_sam**: rescues (2/3 masks ≥ +2.0 pp; max_S_train lower than (a) at 3/3 masks)
-- **(c) h4_high_anchor**: rescues (3/3 masks ≥ +2.0 pp; R02_3k higher than (a) at 3/3 masks)
+- **(a) h4_high**: warm03 masks still win at η = 0.1 (2/3 masks ≥ +2.0 pp)
+- **(b) h4_high_sam**: rescues (2/3 masks ≥ +2.0 pp; max_S_train lower than (a) at 3/3 masks); but (a) already meets the rule, so there is no failure to rescue (H4.md §4: (b) and (c) are secondary)
+- **(c) h4_high_anchor**: rescues (3/3 masks ≥ +2.0 pp; R02_3k higher than (a) at 3/3 masks); but (a) already meets the rule, so there is no failure to rescue (H4.md §4: (b) and (c) are secondary)
