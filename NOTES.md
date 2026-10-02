@@ -569,6 +569,6 @@ Reminders:
   - **13:03 UTC hourly check:** all alive. warm03 s1 9/15, anchor 4/6, SAM 2/6, high 0/6. Runtime 21.7 h of 30.
     - **H4 anchor r6 (12.0%): ticket 86.19% vs shuffle 75.36% → +10.83 pp**; R_0.2 0.762 / 0.807 (≥ 0.661). With r3 (+7.63), **anchor meets the D13 rescue rule (2 of 3 masks ≥ +2.0 pp, manipulation check passed)**, with r8 still to come.
       Caveat: most of the gap comes from the anchor hurting the shuffle (75.4%; high-chain best baseline at r6 85.0%). The ticket (86.2%) sits between the high-chain ticket (85.6%) and the warm03 ticket (88.7%).
-    - **H4 SAM r3: ticket 89.29% vs shuffle 88.14% → +1.15 pp** (below +2.0). max S(25–3k) 0.695 (ticket) / 0.443 (shuffle), the same values as the anchor runs (probably the step-25 point, before SAM/the anchor can act); check this in the write-up.
+    - **H4 SAM r3: ticket 89.29% vs shuffle 88.14% → +1.15 pp** (below +2.0). max S(25–3k) under SAM 0.218 (ticket) / 0.176 (shuffle). Note: the json field `max_S_3k` includes S(0) (0.695 for every r3 ticket, the same theta_0 ⊙ m), so use the commit/summary max S(25–3k) in the write-up.
     - warm03 s1 r4 shuffle 84.39% (adv vs best baseline, reinit 85.52%: +3.56 pp); r5 ticket 88.99%.
     - Forecast: warm03 6 left ≈ 15:15; SAM 4 left (≈ 42 min each) ≈ 15:50; anchor r8 pair then h4_high 6 ≈ 16:00 → **all runs done ≈ 16:00 UTC**, ≈ 24.7 h used.
