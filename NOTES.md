@@ -6,7 +6,53 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ---
 
-## 1. Current status (2026-09-29, session 4, Colab T4)
+## 0. FINAL SUMMARY (2026-10-02, end of session 7): the study is complete
+
+**Nothing is running and nothing is pending.** All results, write-ups, the report and the slides are committed and pushed
+(`main` = GitHub). The Colab runtime can be closed; 26.1 of the 30 runtime hours were used.
+
+**Findings** (details: `results/FINDINGS.md`, `report/FINAL_REPORT.pdf`):
+- **H1 supported (2 seeds).** Ticket − best trained baseline: +2.0 to +6.4 pp at eta 0.01 and at eta 0.03 + warmup; ≤ +0.5 pp at eta 0.1 without
+  warmup (no winning ticket). Warmup at eta 0.1 (high_warm) restores it: +1.5 to +5.9 pp.
+- **H2 not supported.** Max S(25–3k) over 105 runs is 0.54 ≪ 1. Only the failing condition has an early spike (max at step 25), and H4 shows it is not causal.
+- **H3 partly supported.** Warmup coincides with the advantage and removes the spike, but S < 1 does not discriminate, warmup is not needed to train a
+  good mask, and it does not fix a bad one.
+- **H4: the mask, not the training dynamics.** warm03's masks trained at eta 0.1 without warmup still win (+3.59 / +4.80 pp at 12.0 / 6.0%;
+  seed 1: +3.54 / +4.40). SAM lowers S with no effect on the advantage; the L2 anchor raises R_0.2 but makes tickets ≈ 3 pp worse.
+  high's own masks trained *with* warmup still fail (−0.02 / +0.67 / +0.31 pp). Same theta_0, same eta: a good mask wins without warmup, a bad mask loses with it.
+  **Conclusion: a high LR damages the mask that IMP selects, not the training of a good mask; warmup matters while the mask is being found.**
+- **Caveats:** one seed for SAM, anchor, high_warm and F2; good masks at eta 0.1 still 0.6–2.6 pp below dense; 15k steps, 30% per round, no rewinding,
+  one model / dataset; sharpness at 15 points per run, minibatch threshold not measured.
+
+**Deliverables:**
+| What | Where |
+|---|---|
+| Final report | `report/FINAL_REPORT.pdf` (9 pages), `.docx`, source `.md` |
+| Final presentation | `report/LTH_Warmup_Final.pptx` (14 slides, mid-review style) |
+| Verdicts H1–H4 (spec §13) | `results/FINDINGS.md` |
+| Write-ups | `results/PHASE_A.md`, `results/H2_H3.md`, `results/H4.md` (pre-registration §1–5, §8; results §6–7, §9) |
+| Tables / figures | `results/summary.csv`, `ticket_advantage.csv`, `metrics_table.md`, `gate_a.md`, `h4_results.md`, `figures/`, `figures/final/` |
+| Decisions and deviations | `Methodology.md` §9 (D1–D13) |
+| Compute | `results/compute_log.csv`: 137 trainings (incl. 2 anchor-selection runs) |
+
+**Rebuild from `results/` alone:** `python -m analysis.plots` (tables, figs 1–5, `h4_results.md`), then `bash report/build.sh`
+(final figures, PDF / DOCX, PPTX; needs pandoc plus `pip install weasyprint python-pptx`). Tests: `python -m pytest` (23 pass on the T4).
+
+**Not in git (on Drive only):** `checkpoints/` (230 MB: theta_0, masks and trained weights; F1/F2 and H4 read masks from here),
+`data/cifar-10-python.tar.gz`, `research paper/` (PDFs), and the GitHub token in `/content/drive/MyDrive/.secrets/` (outside the repo).
+
+**If the project is picked up again** (ideas, none started): switch eta mid-chain to find the IMP round where masks go bad; compare high and
+warm03 masks directly (layer-wise density, overlap); try learning-rate rewinding (Frankle et al. 2020); second seeds for SAM / anchor / F2.
+
+**Lessons from running it (for similar projects):**
+- VM losses happened three times (09-29, 09-30, 10-01). Resumable runs plus a per-result commit-and-push watcher meant each loss cost
+  only the trainings in progress. Re-calibrate the runtime budget from the Colab usage page after each loss: idle time before a VM dies is not logged.
+- Pre-registering the H4 rule (D13) and the follow-ups before the runs made the unexpected H4 outcome easy to read and defend.
+- `pgrep -f <pattern>` inside a waiting loop can match the loop's own command line; the 17:5x follow-up waiter never exited because of that.
+
+---
+
+## 1. Status log by session (newest first; the session-4 header below is historical)
 
 - **SESSION 7 (2026-10-02): STUDY COMPLETE (main runs 15:39 UTC, follow-ups 17:54 UTC), 26.1 h of 30 h used.** Phase A 60/60, seed 1 45/45, H4 18/18 (+ lam selection).
   Write-ups done: `results/FINDINGS.md` (H1–H4 verdicts, spec §13), `results/H4.md` §6–7, `results/H2_H3.md`, `results/PHASE_A.md`, Methodology §8 status.
@@ -603,3 +649,5 @@ Reminders:
     (mid-review style), `analysis/final_figs.py` (validated palette). LibreOffice installed on the VM only to render slides for checking.
   - **17:54 UTC: follow-ups done.** F1 replicates (2/3 ≥ +2.0 pp, within 0.4 pp of seed 0); F2: warmup removes the transient (max S 0.09–0.12) but
     high's masks still fail (0/3). H4.md §9, FINDINGS, H2_H3, report and deck updated; `analysis/h4_tables.py` lists the follow-ups.
+  - **18:10 UTC:** README updated (commit e0ebe36) with the final findings and pushed. Auto-commit watcher and MPS daemon stopped; git clean, no lock file.
+    Final summary added as §0. **End of session 7: the study is complete; the runtime can be shut down.**
