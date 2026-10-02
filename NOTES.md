@@ -563,3 +563,4 @@ Reminders:
     `queue_h4.sh high configs/h4_high_sam.yaml`. GPU 3 procs, 9.2 GB. Logged runtime 20.4 h, **excluding the idle time before the VM died; re-calibrate from the usage page.**
   - Left: warm03 s1 9, anchor 5, SAM 5 (≈ 2x), h4_high 6 → ≈ 30 training-equivalents. Slots: A anchor→high ≈ 3.9 h, B SAM ≈ 3.5 h, C warm03 ≈ 3.3 h
     → **all runs done ≈ 15:30–16:00 UTC**, then H4.md / Phase B write-up.
+  - **11:44 UTC: budget re-calibrated (user): 9.6 h left** → `RUNTIME_USED_BEFORE_H = 20.4`, `RUNTIME_SINCE = 2026-10-02T11:44:31`. Plan ≈ 5 h → reserve ≈ 4.5 h. Hourly checks.

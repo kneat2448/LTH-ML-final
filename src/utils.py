@@ -27,8 +27,8 @@ RUNTIME_BUDGET_H = 30.0
 # Runtime already used before RUNTIME_SINCE (stated by the user: session 4 27 h left; session 5 20 h left, 15 h left at 09:30 UTC).
 # Only trainings that end after RUNTIME_SINCE are added on top. Re-calibrate both from the Colab
 # usage page when they drift: idle runtime (setup, analysis, gaps between runs) is not logged.
-RUNTIME_USED_BEFORE_H = 16.0
-RUNTIME_SINCE = "2026-10-01T03:37:00"
+RUNTIME_USED_BEFORE_H = 20.4
+RUNTIME_SINCE = "2026-10-02T11:44:31"
 
 
 def set_seed(seed: int) -> None:
