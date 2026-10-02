@@ -556,3 +556,10 @@ Reminders:
   - **07:17 UTC: low and high seed 1 complete (15/15 each); H4 started.** Seed 1 r8 (6.0%): low ticket 86.22% (−0.26 vs dense, adv +6.55 → winning), high 82.36% (−7.19, adv +0.43).
     Two-seed Gate A still PASSED. H4: queue A running `h4_high_anchor --select-lam` (07:12), queue B `h4_high_sam` (07:17); warm03 s1 running. H2_H3.md and PHASE_A.md updated with the final s1 low/high numbers.
   - **07:24 UTC hourly check:** warm03 s1 4/15, H4 lam selection (lam 1e-3 run) and SAM r3 ticket running, GPU 100%, runtime 19.8 h. Forecast ≈ 12:30 UTC.
+- **2026-10-02, session 7 (Colab T4).**
+  - **11:41 UTC:** new VM, nothing running. The 10-01 VM died after the 08:11 autosave (git clean). Lost in progress: warm03 s1 r4 reinit,
+    h4_high_anchor r3 shuffle, h4_high_sam r3 shuffle. Done: Phase A 60/60, seed 1 37/45 (warm03 6/15), H4 2/18 + lam selection (lam = 0.01, R_0.2 0.757 ≥ 0.661).
+    Relaunched: `bash colab/resume_phaseB.sh warm03`; `queue_h4.sh low configs/h4_high_anchor.yaml configs/h4_high.yaml` (no `--select-lam`: already done);
+    `queue_h4.sh high configs/h4_high_sam.yaml`. GPU 3 procs, 9.2 GB. Logged runtime 20.4 h, **excluding the idle time before the VM died; re-calibrate from the usage page.**
+  - Left: warm03 s1 9, anchor 5, SAM 5 (≈ 2x), h4_high 6 → ≈ 30 training-equivalents. Slots: A anchor→high ≈ 3.9 h, B SAM ≈ 3.5 h, C warm03 ≈ 3.3 h
+    → **all runs done ≈ 15:30–16:00 UTC**, then H4.md / Phase B write-up.
