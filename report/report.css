@@ -1,0 +1,25 @@
+@page { size: A4; margin: 2cm 2.1cm 2.2cm; @bottom-right { content: counter(page); font: 9pt Carlito, Calibri, sans-serif; color: #5A6478; } }
+body { font-family: Carlito, Calibri, "Helvetica Neue", Arial, sans-serif; font-size: 10.5pt; line-height: 1.45; color: #1d2433; }
+h1, h2, h3, .title, .subtitle { font-family: Caladea, Cambria, Georgia, serif; color: #14213D; }
+header#title-block-header { border-bottom: 2px solid #B5651D; padding-bottom: 10pt; margin-bottom: 14pt; }
+.title { font-size: 22pt; margin: 0 0 4pt; line-height: 1.15; }
+.subtitle { font-size: 13pt; font-weight: normal; margin: 0 0 8pt; color: #36415a; }
+.author { font-weight: bold; margin: 0; }
+.date { color: #5A6478; margin: 2pt 0 0; font-size: 9.5pt; }
+h2 { font-size: 14.5pt; margin: 18pt 0 6pt; border-bottom: 1px solid #E3E6EC; padding-bottom: 2pt; }
+h3 { font-size: 12pt; margin: 14pt 0 4pt; }
+h2#abstract + p, h2#abstract ~ p:first-of-type { }
+p { margin: 0 0 7pt; text-align: justify; hyphens: auto; }
+ul { margin: 0 0 8pt; padding-left: 16pt; } li { margin-bottom: 3pt; }
+table { border-collapse: collapse; width: 100%; font-size: 9pt; margin: 6pt 0 4pt; page-break-inside: avoid; }
+th { background: #14213D; color: #fff; font-weight: bold; padding: 4pt 5pt; text-align: center; }
+td { padding: 3pt 5pt; border-bottom: 1px solid #E3E6EC; text-align: center; }
+td:first-child, th:first-child { text-align: left; }
+tbody tr:nth-child(even) td { background: #F3F5F9; }
+figure { margin: 10pt 0; page-break-inside: avoid; text-align: center; }
+figure img { width: 88%; }
+figcaption { font-size: 9pt; color: #5A6478; margin-top: 3pt; text-align: left; }
+code { font-size: 9pt; background: #F3F5F9; padding: 0 2pt; }
+strong { color: #14213D; }
+caption { caption-side: bottom; font-size: 9pt; color: #5A6478; text-align: left; padding-top: 4pt; }
+sub, sup { line-height: 0; font-size: 75%; }
