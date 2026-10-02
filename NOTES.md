@@ -572,3 +572,9 @@ Reminders:
     - **H4 SAM r3: ticket 89.29% vs shuffle 88.14% → +1.15 pp** (below +2.0). max S(25–3k) under SAM 0.218 (ticket) / 0.176 (shuffle). Note: the json field `max_S_3k` includes S(0) (0.695 for every r3 ticket, the same theta_0 ⊙ m), so use the commit/summary max S(25–3k) in the write-up.
     - warm03 s1 r4 shuffle 84.39% (adv vs best baseline, reinit 85.52%: +3.56 pp); r5 ticket 88.99%.
     - Forecast: warm03 6 left ≈ 15:15; SAM 4 left (≈ 42 min each) ≈ 15:50; anchor r8 pair then h4_high 6 ≈ 16:00 → **all runs done ≈ 16:00 UTC**, ≈ 24.7 h used.
+  - **13:59 UTC hourly check** (the 13:47 cron fired late): all alive, GPU 3 procs. warm03 s1 11/15, **anchor 6/6 done**, SAM 4/6, h4_high started (0/6). Runtime 22.6 h of 30.
+    - **Anchor complete: advantage +7.63 / +10.83 / +12.32 pp (34.5 / 12.0 / 6.0%) → 3/3 masks ≥ +2.0** (r8: ticket 84.44%, shuffle 72.12%). Achieved R_0.2 at 3k: 0.752 / 0.630 / 0.539 (only r3 reaches the 0.661 target; lam was chosen at r3). The D13 manipulation check compares with (a), which is still pending.
+    - **SAM r6: ticket 88.86% vs shuffle 85.64% → +3.22 pp** → 1 of 2 masks so far (r3 +1.15). max S(25–3k) 0.214.
+    - warm03 s1 r6: ticket 88.67% vs reinit 83.90% → +4.77 pp (seed 0 +4.89); two-seed mean +4.83 pp.
+    - **New ** → `results/h4_results.md` (H4 tables + D13 verdicts with manipulation checks vs (a)); `analysis.plots` calls it, so the autosave keeps it current.
+    - Forecast: warm03 4 left ≈ 15:25, SAM 2 left ≈ 15:25, h4_high 6 (alone at the end, faster) ≈ 16:00 → **all done ≈ 16:00 UTC**, ≈ 24.6 h used.

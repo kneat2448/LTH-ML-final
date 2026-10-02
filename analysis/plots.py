@@ -3,7 +3,7 @@
 Usage:  python -m analysis.plots
 
 Writes results/summary.csv, results/figures/fig{1..5}_*.png, results/metrics_table.{md,csv},
-results/ticket_advantage.csv and results/gate_a.md.
+results/ticket_advantage.csv, results/gate_a.md and (with H4 runs) results/h4_results.md.
 Winning ticket (section 5): ticket acc >= dense acc - 0.5 pp at the same condition, and the
 advantage over the best *trained* baseline is > 0 (with >= 2 seeds: mean > 2 SE).
 """
@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from analysis import h4_tables
 from src.metrics import stability_summary
 from src.utils import RESULTS
 
@@ -270,6 +271,7 @@ def main() -> None:
     fig4_overlap(df, conds)
     if set(H4_CONDITIONS) & set(df.condition):
         fig5_h4(df)
+        h4_tables.main()
     metrics_table(df, conds)
     gate_a(adv)
 
