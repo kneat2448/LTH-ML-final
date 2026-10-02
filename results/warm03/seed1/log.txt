@@ -16,3 +16,5 @@ COST ESTIMATE warm03: 9 trainings x 8.0 min = 1.20 h runtime on Tesla T4; used s
 [warm03 seed1 r4 reinit] mode=warmup remaining=0.2420
    acc=0.8552 f1=0.8546 R02=0.374 maxS3k=0.055 diverged=False wall=24.5min sharp_overhead=79.3% peakVRAM=2459MB
 [warm03 seed1 r4 shuffle] mode=warmup remaining=0.2420
+   acc=0.8439 f1=0.8434 R02=0.397 maxS3k=0.054 diverged=False wall=23.4min sharp_overhead=66.7% peakVRAM=2459MB
+[warm03 seed1 r5 ticket] mode=warmup remaining=0.1701
