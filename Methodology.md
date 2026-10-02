@@ -282,6 +282,7 @@ to 10k before any condition or seed is cut.
 | warm03 | 1 | 5 | 17.0 | ticket | 88.99% | 0.000 | 0.030 | 0.303 | no |
 | warm03 | 1 | 6 | 12.0 | reinit | 83.90% | 0.000 | 0.050 | 0.310 | no |
 | warm03 | 1 | 6 | 12.0 | ticket | 88.67% | 0.000 | 0.036 | 0.273 | no |
+| warm03 | 1 | 7 | 8.4 | ticket | 88.20% | 0.000 | 0.034 | 0.241 | no |
 | high_warm | 0 | 0 | 100.0 | ticket (dense) | 89.46% | 0.000 | 0.092 | 0.331 | no |
 | high_warm | 0 | 1 | 70.1 | ticket | 90.10% | 0.000 | 0.069 | 0.306 | no |
 | high_warm | 0 | 2 | 49.1 | reinit | 88.28% | 0.000 | 0.071 | 0.285 | no |
