@@ -564,3 +564,4 @@ Reminders:
   - Left: warm03 s1 9, anchor 5, SAM 5 (≈ 2x), h4_high 6 → ≈ 30 training-equivalents. Slots: A anchor→high ≈ 3.9 h, B SAM ≈ 3.5 h, C warm03 ≈ 3.3 h
     → **all runs done ≈ 15:30–16:00 UTC**, then H4.md / Phase B write-up.
   - **11:44 UTC: budget re-calibrated (user): 9.6 h left** → `RUNTIME_USED_BEFORE_H = 20.4`, `RUNTIME_SINCE = 2026-10-02T11:44:31`. Plan ≈ 5 h → reserve ≈ 4.5 h. Hourly checks.
+  - **12:04 UTC check:** 3 procs + 2 queues + watcher alive, GPU 100%. No new results yet (first after relaunch due ≈ 12:05–12:25: warm03 s1 r4 reinit, anchor/SAM r3 shuffle). warm03 s1 6/15, H4 anchor 1/6, SAM 1/6, high 0/6. Runtime ≈ 20.7 h of 30. Forecast unchanged: all runs ≈ 15:30–16:00 UTC.
