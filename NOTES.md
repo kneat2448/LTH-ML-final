@@ -578,3 +578,8 @@ Reminders:
     - warm03 s1 r6: ticket 88.67% vs reinit 83.90% → +4.77 pp (seed 0 +4.89); two-seed mean +4.83 pp.
     - **New `analysis/h4_tables.py`** → `results/h4_results.md` (H4 tables + D13 verdicts with manipulation checks vs (a)); `analysis.plots` calls it, so the autosave keeps it current.
     - Forecast: warm03 4 left ≈ 15:25, SAM 2 left ≈ 15:25, h4_high 6 (alone at the end, faster) ≈ 16:00 → **all done ≈ 16:00 UTC**, ≈ 24.6 h used.
+  - **15:03 UTC hourly check:** all alive. warm03 s1 14/15 (r8 shuffle running), anchor 6/6, SAM 5/6 (r8 shuffle running), h4_high 2/6. Runtime 23.5 h of 30.
+    - **(a) plain r3 (34.5%): ticket 89.27% vs shuffle 88.38% → +0.89 pp** (< +2.0; like the high chain's ≤ +0.7). max S(25–3k) 0.339 (SAM 0.218, anchor 0.311); R_0.2 at 3k 0.298 (anchor 0.752).
+    - SAM r8 ticket 87.50%, max S 0.190 (shuffle pending; it decides SAM's verdict: 1/2 so far).
+    - warm03 s1: r7 ticket 88.20%; r8 ticket 87.01% vs reinit 81.58% (+5.43 pp; shuffle pending).
+    - Forecast: warm03 and SAM end ≈ 15:25; h4_high 4 left, faster once alone → **all done ≈ 15:45–16:00 UTC**, ≈ 24.3 h used.
