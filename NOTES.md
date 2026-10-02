@@ -42,7 +42,7 @@ measured and what is still open. **Update it at the end of every work session.**
 `data/cifar-10-python.tar.gz`, `research paper/` (PDFs), and the GitHub token in `/content/drive/MyDrive/.secrets/` (outside the repo).
 
 **If the project is picked up again** (ideas, none started): switch eta mid-chain to find the IMP round where masks go bad; compare high and
-warm03 masks directly (layer-wise density, overlap); try learning-rate rewinding (Frankle et al. 2020); second seeds for SAM / anchor / F2.
+warm03 masks directly (layer-wise density, overlap); try rewinding to an early iteration (Frankle et al. 2020); second seeds for SAM / anchor / F2.
 
 **Lessons from running it (for similar projects):**
 - VM losses happened three times (09-29, 09-30, 10-01). Resumable runs plus a per-result commit-and-push watcher meant each loss cost

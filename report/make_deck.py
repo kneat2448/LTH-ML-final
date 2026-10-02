@@ -209,7 +209,7 @@ def build() -> None:
          ("Ticket advantage", {"bold": True}), (" = ticket − best trained baseline. ", {}),
          ("Winning ticket", {"bold": True}), (" = advantage > 0 (2 seeds: > 2 SE) and accuracy within 0.5 pp of dense.", {})],
         [("Sharpness: ", {"bold": True}), ("λmax by 10-step Lanczos on 2,048 images, 15 points per run; H2 uses max S over steps 25–3,000. ", {}),
-         ("Correlation: ", {"bold": True}), ("R₀.₂ = overlap of the top-20% weights of θ₀ and θ_T (chance ≈ 0.2).", {})],
+         ("Correlation: ", {"bold": True}), ("R₀.₂ = overlap of the top-20% weights at θ₀ and after training (chance ≈ 0.2).", {})],
     ], size=13, color=MUTED_L, para_space=6)
     d.footer(s, "ResNet-20 (0.27 M params) · SGD momentum 0.9 · batch 128 · LR ×0.1 at 10k and 12.5k · one T4 GPU, 3 runs in parallel under MPS.")
 
@@ -243,10 +243,10 @@ def build() -> None:
     d.header(s, "H2 · STABILITY RATIO  —  NOT SUPPORTED", "No ticket comes near the stability limit")
     d.figure(s, FIG / "max_s.png", 0.5, 1.7, w=7.9)
     d.card(s, 8.85, 1.75, 3.88, 2.55, "What fails", [
-        "Max S over 105 runs is 0.54; failing tickets peak at 0.16–0.54.",
+        "Max S over the 105 pruning-chain runs is 0.54 (0.63 with H4); failing tickets peak at 0.16–0.54.",
         "Within a condition S does not order the tickets (high: ρ = +0.26)."])
     d.card(s, 8.85, 4.5, 3.88, 2.1, "What holds", [
-        "Only the failing condition has an early spike (max at step 25 in 15/18). Correlation, not yet cause."], dark_card=True)
+        "Only the failing condition has an early spike (max at step 25 in 15/18). An association, not yet a cause."], dark_card=True)
     d.footer(s, "Caveat: with momentum the step-0 threshold is 2/λ (Kalra & Barkeshli 2024); dense high starts above it and still trains normally.")
 
     # 7. H3
@@ -338,7 +338,7 @@ def build() -> None:
     d.text(s, 0.6, 0.45, 12.13, 0.3, "VERDICTS", size=12, bold=True, color=ORANGE_D)
     d.text(s, 0.6, 0.85, 12.13, 0.9, "High learning rates break the mask, not the training", size=30, bold=True, font=SERIF, color=WHITE)
     verdicts = [("H1 · Replicate", "SUPPORTED", "2 seeds: +2 to +6.4 pp at η 0.01 / warmup; ≤ +0.5 pp at η 0.1"),
-                ("H2 · Stability ratio", "NOT SUPPORTED", "max S 0.54 ≪ 1; the early spike is not causal (H4)"),
+                ("H2 · Stability ratio", "NOT SUPPORTED", "max S ≤ 0.63 ≪ 1 in every run; the early spike is not causal (H4)"),
                 ("H3 · Warmup mechanism", "PARTLY", "Coincidence holds, but warmup is not needed to train a good mask and cannot fix a bad one"),
                 ("H4 · Causal test", "MASK, NOT DYNAMICS", "Good masks win at η 0.1 (2 seeds); bad masks fail even with warmup")]
     for i, (h, tag, b) in enumerate(verdicts):
@@ -361,7 +361,7 @@ def build() -> None:
     d.card(s, 6.82, 1.75, 5.92, 4.1, "Next steps", body_size=16, title_size=18, dark_card=True, body=[
         "Switch η mid-chain to find the IMP round where masks go bad.",
         "Compare high vs warm03 masks directly: layer-wise density, overlap.",
-        "Learning-rate rewinding (Frankle et al. 2020), known to restore tickets at high η: does it work by fixing the mask?"])
+        "Rewinding to an early iteration (Frankle et al. 2020) finds tickets without warmup: does it work by producing better masks?"])
     d.footer(s, "")
 
     # 14. Close
@@ -370,7 +370,7 @@ def build() -> None:
     d.text(s, 0.6, 1.1, 12.13, 2.4, "Lottery tickets fail at high learning rates because iterative magnitude pruning picks worse masks, "
            "not because training becomes unstable or loses its correlation with θ₀.", size=30, bold=True, font=SERIF, color=WHITE)
     d.text(s, 0.6, 3.9, 12.13, 1.4, ["A pre-registered causal test, with the mask held fixed, separated three explanations that the observational data could not.",
-                                      "Code, configs, every run and both write-ups: github.com/kneat2448/LTH-ML-final"], size=17, color=SUB_D, para_space=8)
+                                      "Code, configs, every run and the full report: github.com/kneat2448/LTH-ML-final"], size=17, color=SUB_D, para_space=8)
     d.text(s, 0.6, 6.25, 12.13, 0.4, "Nitai S Koundinya  ·  Umair Ahmed Nawaz", size=16, bold=True, color=WHITE)
     d.text(s, 0.6, 6.65, 12.13, 0.35, "Thank you · questions welcome", size=12, color=MUTED_D)
 

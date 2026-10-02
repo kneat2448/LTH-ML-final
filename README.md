@@ -22,7 +22,7 @@ not the training of a good mask.**
 | Hypothesis | Verdict | Evidence |
 |---|---|---|
 | **H1** Tickets win at η = 0.01 and with warmup, not at η = 0.1 | **Supported** (2 seeds) | Ticket − best trained baseline: +2.0 to +6.4 pp at η = 0.01 / η = 0.03 + warmup; ≤ +0.5 pp at η = 0.1, no winning ticket. Warmup at η = 0.1 restores it (+1.5 to +5.9 pp). |
-| **H2** Tickets fail where S reaches ≈ 1 | **Not supported** | Max S over 105 runs is 0.54. Only the failing condition has an early spike (step ≈ 25), but H4 shows it is not the cause. |
+| **H2** Tickets fail where S reaches ≈ 1 | **Not supported** | Max S over the 105 pruning-chain runs is 0.54 (0.63 with the H4 runs). Only the failing condition has an early spike (step ≈ 25), but H4 shows it is not the cause. |
 | **H3** Warmup keeps S below 1 as the advantage returns | **Partly supported** | The coincidence holds, but the failing runs are also below 1, and warmup neither is needed to train a good mask nor fixes a bad one. |
 | **H4** Fix good masks, train at η = 0.1: does SAM or an L2 anchor rescue them? | **Mask, not dynamics** | The good masks **already win** without any intervention (+3.6 / +4.8 pp; seed 1: +3.5 / +4.4 pp). SAM lowers sharpness with no effect; the anchor raises correlation and makes tickets ~3 pp worse. High's own masks **still fail with warmup** (≤ +0.7 pp), even though warmup removes the spike. |
 

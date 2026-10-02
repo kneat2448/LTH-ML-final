@@ -13,17 +13,17 @@ early training crosses the stability limit η·λ~max~ ≈ 2 + 2β (sharpness). 
 rate decorrelates the trained weights from their initialization (weight correlation). On ResNet-20 / CIFAR-10 with iterative magnitude pruning
 down to 6% of weights, we replicate the phenomenon on two seeds. Tickets beat trained baselines by +2 to +6.4 pp at η = 0.01 and at η = 0.03 with
 warmup, but by at most +0.5 pp at η = 0.1 without warmup. Neither explanation survives. No run comes near the stability limit
-(max S = 0.54). In a pre-registered causal test, the good masks found with warmup, trained at η = 0.1 with no warmup,
+(max S = 0.54 in the pruning chains, 0.63 over all 135 runs). In a pre-registered causal test, the good masks found with warmup, trained at η = 0.1 with no warmup,
 **still win** (+3.6 and +4.8 pp over shuffled controls), despite the same early sharpness transient and near-chance weight correlation.
 Lowering sharpness with SAM changes nothing, and forcing correlation with an L2 anchor does not improve the ticket.
-The result replicates on a second seed, and the reverse test confirms it: the masks found without warmup still fail when trained *with* warmup.
+The result replicates on a second seed, and the reverse test confirms it: the masks found at η = 0.1 without warmup still fail when trained *with* warmup.
 High-learning-rate training does not break the ticket. It breaks **iterative magnitude pruning's choice of mask**.
 
 ## 1. Introduction
 
 The lottery ticket hypothesis (Frankle & Carbin, 2019) states that a dense network contains a sparse subnetwork, the *winning ticket*.
 Reset to its original initialization θ₀ and trained alone, the ticket matches the dense network. Tickets are found by iterative
-magnitude pruning (IMP): train, prune the smallest weights, rewind the survivors to θ₀, repeat. On deeper networks (VGG-19, ResNet-18) this only
+magnitude pruning (IMP): train, prune the smallest weights, reset the survivors to θ₀, repeat. On deeper networks (VGG-19, ResNet-18) this only
 works at a small learning rate or with warmup; at the standard rate the "ticket" is no better than a random reinitialization. Why warmup is
 needed was left open.
 
@@ -54,7 +54,7 @@ and each mechanism is manipulated on its own.
 ## 3. Methods
 
 **Data and model.** CIFAR-10 is split into 45,000 training and 5,000 validation images, plus the official 10,000-image test set (used only
-for reported numbers). Augmentation is random crop with 4-px padding and horizontal flip. The model is ResNet-20 (3 stages × 3 basic blocks,
+for reported numbers). Augmentation is random crop with 4-px padding and horizontal flip. The model is ResNet-20 (He et al., 2016; 3 stages × 3 basic blocks,
 16/32/64 channels, BatchNorm, 0.27 M parameters).
 
 **Training.** SGD with momentum β = 0.9, batch 128, weight decay 10⁻⁴, 15,000 iterations (≈ 38 epochs), learning rate × 0.1 at 10k and 12.5k,
@@ -132,7 +132,8 @@ baseline: the dense network does well, and only IMP's tickets lose their edge.
 
 ![Figure 2. Max S(t) over steps 25–3,000 for every ticket, by condition. The dashed line is the stability limit S = 1.](../results/figures/final/max_s.png)
 
-- **No run reaches the limit.** Over 63 tickets and 42 baselines, the largest max S(25–3k) is 0.54. The failing high tickets peak at 0.16–0.54,
+- **No run reaches the limit.** Over the 63 tickets (including the dense networks) and 42 baselines of the pruning chains, the largest max S(25–3k) is 0.54
+  (0.63 if the H4 runs are included). The failing high tickets peak at 0.16–0.54,
   a factor of 2 to 6 below S = 1.
 - **The failing condition does stand apart.** The high tickets (0.16–0.54) do not overlap any winning condition (≤ 0.15), and across all tickets
   the Spearman correlation between max S and the ticket's gap to dense is ρ = −0.59 (n = 56). The difference is a brief transient: in 15 of 18 high
@@ -208,7 +209,7 @@ The H4 verdict rested on one seed, and "the mask is the cause" was inferred rath
 
 **F2, reverse swap: warmup does not rescue a bad mask.** high's own masks, trained from the same θ₀ on the high_warm schedule, stay at or below
 +0.7 pp, which is the failing chain's level. Warmup did what it does elsewhere: it removed the early transient (max S 0.09–0.12, against
-0.18–0.29 without warmup) and kept slightly more correlation (R~0.2~ 0.25–0.28 vs 0.22–0.23). Yet the tickets were no better
+0.18–0.29 without warmup) and kept slightly more correlation (R~0.2~ 0.25–0.28 vs 0.22–0.24). Yet the tickets were no better
 (87.64 / 85.08 / 82.04% vs 88.36 / 85.52 / 82.72% without warmup).
 
 Together, with θ₀ and η = 0.1 held fixed, **a good mask wins without warmup, and a bad mask loses with it.** Warmup during training is neither
@@ -219,9 +220,10 @@ necessary for a good mask nor sufficient for a bad one.
 **What the evidence supports.** Tickets fail at η = 0.1 without warmup (H1), but the stability ratio never reaches 1 (H2), and warmup's role is not to
 train a given mask more stably (H3). The causal test points away from training dynamics altogether. A good mask trains to a winning ticket at η = 0.1,
 through the same early sharpness spike and the same loss of correlation that accompany the failing chain. What differs is the mask. The high
-learning rate damages **IMP's selection of the mask**: the magnitudes after a high-learning-rate training run are a poor guide to which weights should
-survive, and pruning on them compounds over rounds. This fits Paul et al. (2023), who show that an IMP mask encodes information about the training run that
-produced it, and it reframes Frankle & Carbin's warmup observation: warmup matters while the mask is being *found*. The reverse swap (F2) tests this directly: applying warmup only when the bad mask is trained, after the mask has been found, does not help.
+learning rate damages **IMP's selection of the mask**. One explanation consistent with this, which we did not test, is that the weight magnitudes after a
+high-learning-rate run are a poor guide to which weights should survive, and that the error compounds over pruning rounds. This fits Paul et al. (2023), who show that an IMP mask encodes information about the training run that
+produced it, and it reframes Frankle & Carbin's warmup observation: warmup matters while the mask is being *found*. The reverse swap (F2) supports this: applying warmup only when the bad mask is trained, after the mask has been found, does not help, while
+high_warm, which uses warmup throughout IMP, finds winning masks.
 
 **Why the two literature explanations looked plausible.** In the observational data every variable moves together: the failing condition has the early
 sharpness spike, the lowest correlation, and the bad masks. Only by holding the mask fixed and varying the training does the confound break. This is
@@ -232,15 +234,15 @@ the main methodological lesson of the project.
 - **Seeds.** Two seeds for the main conditions; one for high_warm, SAM, the anchor and the reverse swap. The central H4(a) result holds on two seeds (F1).
 - **Strict definition.** Under the winning-ticket definition (within 0.5 pp of dense), the plain η = 0.1 tickets on warm03's masks are still
   0.56, 0.92 and 2.59 pp below dense high (89.83%). Some cost of η = 0.1 survives a good mask, and the advantage is smaller than in warm03 itself
-  (+3.59 vs +4.89 pp at 12.0%).
+  (+3.59 vs +4.89 pp at 12.0%, though against different baselines: shuffle in H4, reinit in the chain).
 - **Shortened protocol.** 15k iterations (Frankle uses 30k), 30% pruning per round (Frankle 20%), no rewinding, one architecture and one dataset.
 - **Sharpness sampling.** 15 points per run on a fixed 2,048-image batch; transients between points (especially within the first 25 steps) are missed,
   and the minibatch stability threshold was not measured.
 - **Interventions at one strength.** SAM at ρ = 0.05 and the anchor at λ = 10⁻² only.
 
 **Next steps.** (1) Test which *round* of IMP at η = 0.1 first produces a bad mask, by switching the learning rate mid-chain. (2) Compare high and warm03
-masks directly (layer-wise density, overlap) to find what distinguishes them. (3) Repeat with learning-rate rewinding (Frankle et al., 2020), which is known
-to restore tickets at high rates and would test the mask-selection reading.
+masks directly (layer-wise density, overlap) to find what distinguishes them. (3) Repeat with rewinding to an early training iteration instead of θ₀ (Frankle et al., 2020), which is known
+to find tickets in deep networks at standard learning rates without warmup, and ask whether it works by producing better masks.
 
 ## 6. Conclusion
 
@@ -257,10 +259,8 @@ does not improve the ticket. The failure lies in the mask that iterative magnitu
 - Frankle, J., Dziugaite, G. K., Roy, D., Carbin, M. (2020). Linear mode connectivity and the lottery ticket hypothesis. *ICML*. arXiv:1912.05671.
 - He, K., Zhang, X., Ren, S., Sun, J. (2016). Deep residual learning for image recognition. *CVPR*.
 - Kalra, D. S., Barkeshli, M. (2024). Why warmup the learning rate? Underlying mechanisms and improvements. *NeurIPS*. arXiv:2406.09405.
-- Lange, R. T., Sprekeler, H. (2023). Lottery tickets in evolutionary optimization: on sparse backpropagation-free trainability. *ICML*. arXiv:2306.00045.
 - Liu, N., Yuan, G., et al. (2021). Lottery ticket preserves weight correlation: is it desirable or not? *ICML*. arXiv:2102.11068.
-- Paul, M., Chen, F., Larsen, B. W., Frankle, J., Ganguli, S., Dziugaite, G. K. (2023). Unmasking the lottery ticket hypothesis: what is encoded in a winning ticket's mask? *ICLR*. arXiv:2210.03044.
-- Sakamoto, K., Sato, I. (2022). Analyzing lottery ticket hypothesis from PAC-Bayesian theory perspective. *NeurIPS*. arXiv:2205.07320.
+- Paul, M., Chen, F., Larsen, B. W., Frankle, J., Ganguli, S., Dziugaite, G. K. (2023). Unmasking the lottery ticket hypothesis: what's encoded in a winning ticket's mask? *ICLR*. arXiv:2210.03044.
 
 ## Appendix: reproducibility
 
