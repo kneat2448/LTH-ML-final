@@ -8,11 +8,14 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ## 1. Current status (2026-09-29, session 4, Colab T4)
 
-- **SESSION 7 (2026-10-02): ALL RUNS COMPLETE (15:39 UTC), 24.3 h of 30 h used.** Phase A 60/60, seed 1 45/45, H4 18/18 (+ lam selection).
+- **SESSION 7 (2026-10-02): STUDY COMPLETE (main runs 15:39 UTC, follow-ups 17:54 UTC), 26.1 h of 30 h used.** Phase A 60/60, seed 1 45/45, H4 18/18 (+ lam selection).
   Write-ups done: `results/FINDINGS.md` (H1–H4 verdicts, spec §13), `results/H4.md` §6–7, `results/H2_H3.md`, `results/PHASE_A.md`, Methodology §8 status.
   **Main result (H4): warm03's masks still win at eta = 0.1 without warmup (+3.59 / +4.80 pp at 12.0 / 6.0%)** → high's failure lies in the masks IMP
   finds at eta = 0.1, not in sharpness or the loss of weight correlation. SAM lowers S and changes nothing; the anchor hurts the shuffle more than the ticket.
-  Left: nothing required by the spec's definition of done, except (if wanted) the final report/slides built from FINDINGS.md.
+  **Follow-ups (user-approved, pre-registered in H4.md §8, results §9), done 17:54 UTC:** F1 = (a) on seed 1 → replicates (+0.93 / +3.54 / +4.40);
+  F2 = high's masks + warmup → no rescue (−0.02 / +0.67 / +0.31). **Final report + deck done:** `report/FINAL_REPORT.{md,pdf,docx}`,
+  `report/LTH_Warmup_Final.pptx`; rebuild everything with `bash report/build.sh` (needs `pip install weasyprint python-pptx`).
+  Final runtime 26.1 h of 30 h. **The study is complete; nothing is running.**
 - **SESSION 6 (2026-10-01, from 03:32 UTC): recovered from the VM loss (≈ 10:00 UTC 09-30) and relaunched everything; H4 is queued.**
   Status at 03:32: Phase A 55/60 (high_warm: r6 reinit, r7 ticket, r8 ticket/reinit/shuffle left), seed 1 12/45 (low 6, high 6, warm03 0), H4 0/18.
   Running under MPS: high_warm s0, low s1, high s1; `resume_phaseB.sh warm03` waits for high_warm. **H4 queue (`colab/queue_h4.sh`)**: slot A waits
@@ -594,3 +597,9 @@ Reminders:
     warm03 s1 final: +2.03 / +3.56 / +4.77 / +5.43 pp; r8 ticket 0.80 pp below dense (s1 strict 3/4, means 4/4).
   - **15:47 UTC:** `results/FINDINGS.md` written; H4.md §6–7, H2_H3.md, PHASE_A.md and the Methodology §8 status updated. Seed-to-seed spread
     of advantages corrected to ≤ 0.6 pp (2.0 pp for warm03 at 6.0%); the earlier ≈ 0.05–0.4 pp came from rounds 2–6 only.
+  - **15:50 UTC: follow-ups pre-registered** (H4.md §8, commit 1aed4dc) and launched in 2 slots: F1 `queue_h4.sh low "configs/h4_high.yaml --seeds 1"`,
+    F2 `queue_h4.sh high configs/h4_swap_high_warm.yaml` (new config: high's seed-0 masks, high_warm schedule). ≈ 23 min per training.
+  - **16:05 UTC:** final report and deck drafted: `report/FINAL_REPORT.md` → pdf/docx (pandoc + weasyprint), `report/make_deck.py` → pptx
+    (mid-review style), `analysis/final_figs.py` (validated palette). LibreOffice installed on the VM only to render slides for checking.
+  - **17:54 UTC: follow-ups done.** F1 replicates (2/3 ≥ +2.0 pp, within 0.4 pp of seed 0); F2: warmup removes the transient (max S 0.09–0.12) but
+    high's masks still fail (0/3). H4.md §9, FINDINGS, H2_H3, report and deck updated; `analysis/h4_tables.py` lists the follow-ups.

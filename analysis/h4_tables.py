@@ -21,7 +21,11 @@ R02_AT = 3000
 
 
 def _load(cond: str, rnd: int, variant: str) -> dict | None:
-    p = RESULTS / cond / "seed0" / f"round{rnd}_{variant}.json"
+    return _load_seed(cond, 0, rnd, variant)
+
+
+def _load_seed(cond: str, seed: int, rnd: int, variant: str) -> dict | None:
+    p = RESULTS / cond / f"seed{seed}" / f"round{rnd}_{variant}.json"
     if not p.exists():
         return None
     r = json.loads(p.read_text())
@@ -95,6 +99,19 @@ def main() -> None:
                   + ", ".join(f"lam {k} → {v:.3f}" for k, v in s["R02"].items())
                   + f"; target {s['target_R02']:.3f}; reached: {s['reached_target']})."]
     lines += ["", "## Verdicts (D13)", ""] + [f"- **({k}) {CONDS[k]}**: {verdict(d, k)}" for k in CONDS] + [""]
+    # follow-ups (H4.md §8): F1 = (a) on seed 1, F2 = high's own masks trained with warmup
+    follow = {"F1: h4_high seed 1": ("h4_high", 1), "F2: h4_swap_high_warm seed 0": ("h4_swap_high_warm", 0)}
+    rows = []
+    for lab, (cond, seed) in follow.items():
+        advs = []
+        for rnd in ROUNDS:
+            t, s = (_load_seed(cond, seed, rnd, v) for v in ("ticket", "shuffle"))
+            advs.append(None if t is None or s is None else t["acc"] - s["acc"])
+        if any(a is not None for a in advs):
+            n = sum(a is not None and a >= RESCUE_PP for a in advs)
+            rows.append(f"| {lab} | " + " | ".join(_f(a, '{:+.2f}') for a in advs) + f" | {n}/{sum(a is not None for a in advs)} |")
+    if rows:
+        lines += ["## Follow-ups (H4.md §8–9)", "", "| Run | 34.5% | 12.0% | 6.0% | ≥ +2.0 pp |", "|---|---|---|---|---|"] + rows + [""]
     (RESULTS / "h4_results.md").write_text("\n".join(lines))
     print("\n".join(lines))
 

@@ -23,3 +23,10 @@ Anchor lam chosen: 0.01 (R_0.2 at 3k: lam 0.001 → 0.479, lam 0.01 → 0.757; t
 - **(a) h4_high**: warm03 masks still win at η = 0.1 (2/3 masks ≥ +2.0 pp)
 - **(b) h4_high_sam**: rescues (2/3 masks ≥ +2.0 pp; max_S_train lower than (a) at 3/3 masks); but (a) already meets the rule, so there is no failure to rescue (H4.md §4: (b) and (c) are secondary)
 - **(c) h4_high_anchor**: rescues (3/3 masks ≥ +2.0 pp; R02_3k higher than (a) at 3/3 masks); but (a) already meets the rule, so there is no failure to rescue (H4.md §4: (b) and (c) are secondary)
+
+## Follow-ups (H4.md §8–9)
+
+| Run | 34.5% | 12.0% | 6.0% | ≥ +2.0 pp |
+|---|---|---|---|---|
+| F1: h4_high seed 1 | +0.93 | +3.54 | +4.40 | 2/3 |
+| F2: h4_swap_high_warm seed 0 | -0.02 | +0.67 | +0.31 | 0/3 |

@@ -23,7 +23,7 @@ The seeds agree to within 0.6 pp on every advantage except warm03 at 6.0% (+7.43
   The difference is a transient: in 15 of 18 high tickets the maximum falls at step 25.
 - **S does not order the tickets within a condition.** ρ is +0.26 for high, −0.38 for low and +0.19 for warm03. S(0) tracks mask density, not failure.
 - **The causal test (H4) goes against the transient.** warm03's masks trained at eta = 0.1 show the same transient (max S 0.24–0.34) and still win.
-  SAM lowered S at every mask and left the advantage unchanged (Δ ≤ 0.5 pp).
+  SAM lowered S at every mask and left the advantage unchanged (Δ ≤ 0.5 pp). In reverse, warmup removed the transient from high's own masks (F2) and they still failed.
 - **The threshold itself is uncertain.** Under momentum the step-0 threshold is 2/lambda (Kalra & Barkeshli 2024), and against that dense high starts above it (1.27 / 2.03).
   The minibatch threshold is lower than (2 + 2·beta)/lambda and was not measured.
 
@@ -32,11 +32,11 @@ The seeds agree to within 0.6 pp on every advantage except warm03 at 6.0% (+7.43
 - **The coincidence holds.** At eta = 0.1, warmup brings the ticket advantage back (high_warm 3/4 winning vs high 0/4) and removes the step-25 transient (S ≤ 0.003 vs 0.13–0.54).
 - **"Keeps S below 1" does not discriminate.** high stays below 1 as well, and from step ~1,000 both runs sit at the same plateau (S 0.03–0.04).
 - **Warmup is not needed to *train* a good mask.** H4(a) shows this.
-- **What remains possible is that warmup matters for *finding* the mask during IMP.** high_warm finds winning masks at eta = 0.1 and high does not.
-  That fits the data but was not tested directly.
+- **Warmup matters for *finding* the mask during IMP.** high_warm finds winning masks at eta = 0.1 and high does not.
+  The reverse swap (F2) tests this: warmup applied only when high's (bad) masks are trained does not help them (≤ +0.67 pp vs shuffle).
 - **The Phase A coincidence is confounded:** warmup also keeps more weight correlation (dense R_0.2 0.33 vs 0.25) and halves the mean LR over the first 10k steps.
 
-## H4 (causal test, masks held fixed): **the premise fails; the failure comes from the mask, not from training at eta = 0.1**
+## H4 (causal test, masks held fixed): **the premise fails; the failure comes from the mask, not from training at eta = 0.1** (confirmed by two follow-ups)
 
 Rescue rule (D13, fixed before the data): ticket − shuffle ≥ +2.0 pp at ≥ 2 of 3 masks, and the intervention must move its target variable.
 Masks are warm03 seed 0 rounds 3, 6 and 8 (34.5, 12.0 and 6.0% remaining); one seed.
@@ -54,16 +54,20 @@ Masks are warm03 seed 0 rounds 3, 6 and 8 (34.5, 12.0 and 6.0% remaining); one s
 - **(b) SAM changes nothing** that matters (Δ advantage ≤ 0.5 pp, tickets within 0.3 pp of (a)).
 - **(c) The anchor's large advantage is not a better ticket.** The anchored tickets lose 2.7–3.6 pp against (a) and the shuffles lose 10.0–10.4 pp.
   So pulling toward theta_0 helps the original pairing of mask and theta_0 relative to a shuffle, but it does not improve the ticket.
+- **Follow-ups (pre-registered in `H4.md` §8, results in §9):**
+  - **F1, (a) on seed 1: replicates.** +0.93 / **+3.54** / **+4.40** pp (2/3 ≥ +2.0), within 0.4 pp of seed 0 at every mask.
+  - **F2, high's own masks trained *with* warmup (same theta_0, eta = 0.1): no rescue.** −0.02 / +0.67 / +0.31 pp (0/3).
+    Warmup removed the early transient (max S 0.09–0.12 vs 0.18–0.29) and the tickets still did not improve (82.04% vs 82.72% at 6.0%).
+  - So, with theta_0 and eta held fixed, a good mask wins without warmup and a bad mask loses with it.
 - **Limits.**
-  - One seed. The (a)/(b) advantages of +3.2 to +5.3 pp are well above the seed-to-seed spread of advantages in low / high / warm03 (≤ 0.6 pp, and 2.0 pp once: warm03 at 6.0%).
+  - One seed for (b), (c) and F2; (a) now has two. The (a)/(b) advantages of +3.2 to +5.3 pp are well above the seed-to-seed spread of advantages in low / high / warm03 (≤ 0.6 pp, and 2.0 pp once: warm03 at 6.0%).
     The (a) verdict needs both passing masks. Each clears +2.0 pp by more than the largest spread seen there: 12.0% by 1.6 pp (spread ≤ 0.3), 6.0% by 2.8 pp (spread up to 2.0).
   - Under the strict winning-ticket definition, (a)'s tickets are still 0.56, 0.92 and 2.59 pp below dense high (89.83%), so some of eta = 0.1's cost survives a good mask.
   - Only warm03's masks were tested.
 
 **Overall.** Tickets fail at eta = 0.1 without warmup (H1), but the cause is not the stability ratio reaching 1 (H2), and warmup's benefit does not come from training a given mask more stably (H3, H4).
-A good mask trains fine at eta = 0.1. What the high LR breaks is IMP's choice of mask.
-The natural next experiment is the reverse swap: high's masks trained under warm03 / high_warm. It is not in this study.
+A good mask trains fine at eta = 0.1 (two seeds), and a bad mask stays bad with warmup. What the high LR breaks is IMP's choice of mask.
 
 ## Compute
 
-136 logged trainings, 24.3 h of the 30 h Colab runtime budget (`compute_log.csv`; `src/utils.py` re-calibrated against the Colab usage page after each VM loss).
+137 trainings (incl. 2 anchor-selection runs; 12 of them the follow-ups), 26.1 h of the 30 h Colab runtime budget (`compute_log.csv`; `src/utils.py` re-calibrated against the Colab usage page after each VM loss).

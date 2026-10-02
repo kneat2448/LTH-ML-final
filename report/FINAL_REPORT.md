@@ -16,7 +16,7 @@ warmup, but by at most +0.5 pp at η = 0.1 without warmup. Neither explanation s
 (max S = 0.54). In a pre-registered causal test, the good masks found with warmup, trained at η = 0.1 with no warmup,
 **still win** (+3.6 and +4.8 pp over shuffled controls), despite the same early sharpness transient and near-chance weight correlation.
 Lowering sharpness with SAM changes nothing, and forcing correlation with an L2 anchor does not improve the ticket.
-<!--F-ABSTRACT-->
+The result replicates on a second seed, and the reverse test confirms it: the masks found without warmup still fail when trained *with* warmup.
 High-learning-rate training does not break the ticket. It breaks **iterative magnitude pruning's choice of mask**.
 
 ## 1. Introduction
@@ -91,8 +91,8 @@ condition's level (0.661); λ = 10⁻² reached 0.757. **The decision rule was f
 the ticket if ticket − shuffle ≥ +2.0 pp at ≥ 2 of the 3 masks, *and* it moved its target variable relative to (a) (SAM lowers max S; the anchor
 raises R~0.2~ at step 3,000). The 2.0 pp bar sits above everything the failing high chain produced (≤ +0.7 pp).
 
-**Scale and compute.** Seeds 0 and 1 for low, high and warm03; seed 0 for high_warm and H4; 141 trainings in all<!--F-COUNT-->,
-on one NVIDIA T4 (Colab), three processes in parallel under CUDA MPS. Total ≈ <!--F-HOURS--> of a 30-hour budget.
+**Scale and compute.** Seeds 0 and 1 for low, high and warm03; seed 0 for high_warm and H4, plus two pre-registered follow-ups (H4(a) on seed 1, and a reverse swap; §4.5); 137 trainings in all (including 2 short runs that chose the anchor strength),
+on one NVIDIA T4 (Colab), three processes in parallel under CUDA MPS. Total ≈ 26 hours of a 30-hour runtime budget.
 
 ## 4. Results
 
@@ -156,7 +156,7 @@ over the first 10k steps.
 
 ### 4.4 H4: the causal test
 
-![Figure 3. Ticket − shuffle advantage on warm03's three masks, trained at η = 0.1 without warmup. Dashed line: the pre-registered +2.0 pp rescue bar.<!--F1-CAPTION-->](../results/figures/final/h4_interventions.png)
+![Figure 3. Ticket − shuffle advantage on warm03's three masks, trained at η = 0.1 without warmup. Dashed line: the pre-registered +2.0 pp rescue bar. Open circles: (a) repeated on seed 1 (F1, §4.5).](../results/figures/final/h4_interventions.png)
 
 | Mask | (a) plain | (b) SAM | (c) L2 anchor |
 |---|---|---|---|
@@ -176,7 +176,7 @@ while the shuffled controls on the two masks are equal (82.4% vs 82.2%). Both re
 - **the early sharpness transient is present** (max S 0.24–0.34, inside the failing high chain's range and 6–9× warm03's), and the ticket still wins;
 - **the weight correlation is lost** (final R~0.2~ 0.18–0.20, chance level, no higher than in the failing high chain), and the ticket still wins.
 
-![Figure 4. Ticket accuracy on three masks under the same training. The mask decides.<!--F2-CAPTION-->](../results/figures/final/h4_masks.png)
+![Figure 4. Ticket accuracy on three masks under the same training. The green and orange lines differ only in the mask (same θ₀, η = 0.1, no warmup); the orange and violet lines differ only in warmup (F2, §4.5). The mask decides.](../results/figures/final/h4_masks.png)
 
 **(b) SAM** lowered max S below (a) at all three masks (the manipulation worked) and left the advantage where it was (Δ ≤ 0.5 pp; ticket accuracy within
 0.3 pp of (a)). Lowering sharpness after the first steps changes neither the ticket nor its advantage.
@@ -194,7 +194,25 @@ analysis treats them as secondary.
 The H4 verdict rested on one seed, and "the mask is the cause" was inferred rather than tested. We pre-registered and ran two follow-ups
 (same code, same +2.0 pp rule) before seeing their results.
 
-<!--F-RESULTS-->
+| Run | 34.5% | 12.0% | 6.0% | Masks ≥ +2.0 pp |
+|----------------------------------------|--------|--------|--------|----------|
+| (a) seed 0 · warm03 masks, η 0.1 | +0.89 | +3.59 | +4.80 | 2 / 3 |
+| **F1** · the same on seed 1 | +0.93 | **+3.54** | **+4.40** | **2 / 3** |
+| high chain · its own masks, η 0.1 | — | +0.39 | +0.57 | 0 / 2 |
+| **F2** · high's masks, η 0.1 **+ warmup** | −0.02 | +0.67 | +0.31 | **0 / 3** |
+
+: Table 3. Ticket − baseline advantage (pp) in the follow-up runs. F1 uses warm03 seed 1's masks and θ₀; F2 uses high's seed-0 masks and the high_warm schedule. The high-chain row is from Phase A (reinit at 12.0%, shuffle at 6.0%).
+
+**F1, replication: confirmed.** On an independent seed, warm03's masks win at η = 0.1 without warmup at 2 of 3 masks, with advantages within
+0.4 pp of seed 0 at every mask. As in seed 0, the early sharpness transient is present (max S 0.25–0.27) and R~0.2~ is at chance (0.18–0.20).
+
+**F2, reverse swap: warmup does not rescue a bad mask.** high's own masks, trained from the same θ₀ on the high_warm schedule, stay at or below
++0.7 pp, which is the failing chain's level. Warmup did what it does elsewhere: it removed the early transient (max S 0.09–0.12, against
+0.18–0.29 without warmup) and kept slightly more correlation (R~0.2~ 0.25–0.28 vs 0.22–0.23). Yet the tickets were no better
+(87.64 / 85.08 / 82.04% vs 88.36 / 85.52 / 82.72% without warmup).
+
+Together, with θ₀ and η = 0.1 held fixed, **a good mask wins without warmup, and a bad mask loses with it.** Warmup during training is neither
+necessary for a good mask nor sufficient for a bad one.
 
 ## 5. Discussion
 
@@ -203,7 +221,7 @@ train a given mask more stably (H3). The causal test points away from training d
 through the same early sharpness spike and the same loss of correlation that accompany the failing chain. What differs is the mask. The high
 learning rate damages **IMP's selection of the mask**: the magnitudes after a high-learning-rate training run are a poor guide to which weights should
 survive, and pruning on them compounds over rounds. This fits Paul et al. (2023), who show that an IMP mask encodes information about the training run that
-produced it, and it reframes Frankle & Carbin's warmup observation: warmup matters while the mask is being *found*.<!--F2-DISCUSSION-->
+produced it, and it reframes Frankle & Carbin's warmup observation: warmup matters while the mask is being *found*. The reverse swap (F2) tests this directly: applying warmup only when the bad mask is trained, after the mask has been found, does not help.
 
 **Why the two literature explanations looked plausible.** In the observational data every variable moves together: the failing condition has the early
 sharpness spike, the lowest correlation, and the bad masks. Only by holding the mask fixed and varying the training does the confound break. This is
@@ -211,7 +229,7 @@ the main methodological lesson of the project.
 
 **Limitations.**
 
-- **Seeds.** Two seeds for the main conditions; one for high_warm and for SAM / anchor. <!--F1-LIMIT-->
+- **Seeds.** Two seeds for the main conditions; one for high_warm, SAM, the anchor and the reverse swap. The central H4(a) result holds on two seeds (F1).
 - **Strict definition.** Under the winning-ticket definition (within 0.5 pp of dense), the plain η = 0.1 tickets on warm03's masks are still
   0.56, 0.92 and 2.59 pp below dense high (89.83%). Some cost of η = 0.1 survives a good mask, and the advantage is smaller than in warm03 itself
   (+3.59 vs +4.89 pp at 12.0%).
@@ -228,8 +246,8 @@ to restore tickets at high rates and would test the mask-selection reading.
 
 We replicated the lottery ticket learning-rate effect on ResNet-20 / CIFAR-10 on two seeds and tested two mechanistic explanations with a pre-registered
 causal experiment. Neither sharpness nor weight correlation explains why tickets fail at a high learning rate without warmup: a good mask still wins under
-exactly those training conditions, and directly lowering sharpness or raising correlation does not improve the ticket. The failure lies in the mask that
-iterative magnitude pruning selects when the network is trained at a high learning rate.
+exactly those training conditions (on two seeds), a bad mask still fails when warmup is added, and directly lowering sharpness or raising correlation
+does not improve the ticket. The failure lies in the mask that iterative magnitude pruning selects when the network is trained at a high learning rate.
 
 ## References
 

@@ -148,8 +148,9 @@ collapse rather than a systematic ticket deficit (F1, F2).
 | 4 | **Gate A:** the ticket beats trained baselines at ≥ 3 sparsities for `low` and `warm03`, and not for `high` (`results/gate_a.md`). If it fails, stop and write up why | **PASSED on seed 0, final for the three gate conditions** (low 4/4, warm03 4/4, high 0/4 winning tickets, D12) |
 | 5 | Phase B: seed 1 of `low`, `high` and `warm03` (error bars) | **done** (low/high 2026-10-01 07:17 UTC, warm03 2026-10-02 15:15 UTC) |
 | 6 | Phase B: H4 (lam selection, then 3 conditions × 3 masks × ticket + shuffle) | **done** (2026-10-02 15:39 UTC); lam = 0.01; `results/H4.md` §6–7, `results/h4_results.md` |
+| 6b | H4 follow-ups (pre-registered, `results/H4.md` §8–9): F1 (a) on seed 1, F2 high's masks + warmup | **done** (2026-10-02 17:54 UTC): F1 replicates, F2 no rescue |
 | 7 | Analysis: `python -m analysis.plots` → summary.csv, figs 1–5, metrics table, gate_a.md | script ready; re-run every 15 min by the autosave |
-| 8 | `results/FINDINGS.md`: verdict + numbers for H1–H4; final report | pending |
+| 8 | `results/FINDINGS.md`: verdict + numbers for H1–H4; final report | **done**: `results/FINDINGS.md`, `report/FINAL_REPORT.pdf`, `report/LTH_Warmup_Final.pptx` |
 
 **Compute (T4, D11 schedule):** Phase A ≈ 9 GPU-h and Phase B ≈ 10 GPU-h of training. The budget is **30 h of Colab
 runtime** (wall-clock usage, not GPU-hours; 27 h were left at the start of session 4, **20 h at 05:02 UTC in session 5**). Every training goes to

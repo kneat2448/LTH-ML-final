@@ -144,7 +144,7 @@ def acc(df, cond, rnd, seed, variant="ticket"):
 
 
 def f(v, fmt="{:+.2f}"):
-    return "pending" if v is None else fmt.format(v)
+    return "pending" if v is None else fmt.format(v).replace("-", "−")
 
 
 def build() -> None:
@@ -289,7 +289,7 @@ def build() -> None:
     s = d.slide(dark=False)
     d.header(s, "H4 · RESULT", "The good masks already win at η = 0.1. There is nothing to rescue")
     d.figure(s, FIG / "h4_interventions.png", 0.5, 1.7, w=7.9)
-    d.card(s, 8.85, 1.75, 3.88, 1.6, "(a) plain", ["+3.6 and +4.8 pp: 2/3 over the bar."], tag="WINS")
+    d.card(s, 8.85, 1.75, 3.88, 1.6, "(a) plain", ["+3.6 and +4.8 pp: 2/3 over the bar. Seed 1: +3.5, +4.4."], tag="WINS")
     d.card(s, 8.85, 3.5, 3.88, 1.45, "(b) SAM", ["S lowered at 3/3 masks; advantage moves ≤ 0.5 pp."], tag="NO EFFECT")
     d.card(s, 8.85, 5.1, 3.88, 1.5, "(c) anchor", ["Ticket −3 pp, shuffle −10 pp vs (a). Not a better ticket."], dark_card=True, tag="HURTS")
     has_f1 = (df.condition.eq("h4_high") & df.seed.eq(1)).any()
@@ -299,12 +299,12 @@ def build() -> None:
     s = d.slide(dark=False)
     d.header(s, "H4 · INTERPRETATION", "Same training, different mask: the mask decides")
     d.figure(s, FIG / "h4_masks.png", 0.5, 1.7, w=7.9)
-    d.card(s, 8.85, 1.75, 3.88, 2.75, "Under identical training", [
-        "η = 0.1, no warmup, same θ₀:",
-        "warm03's 6% mask 87.2%, high's own 6% mask 82.7%.",
+    d.card(s, 8.85, 1.75, 3.88, 2.45, "Under identical training", [
+        "η = 0.1, no warmup, same θ₀: warm03's 6% mask 87.2%, high's own 6% mask 82.7%.",
         "Shuffled controls equal (82.4 vs 82.2%)."])
-    d.card(s, 8.85, 4.7, 3.88, 1.9, "Both stories fail", [
-        "Spike present (S 0.24–0.34) and R₀.₂ at chance (0.18–0.20), yet the ticket wins."], dark_card=True)
+    d.card(s, 8.85, 4.35, 3.88, 2.25, "Both stories fail", [
+        "Good mask: spike present, R₀.₂ at chance, ticket wins.",
+        "Bad mask + warmup: spike gone, ticket still fails (F2)."], dark_card=True)
     d.footer(s, "high and warm03 seed 0 share θ₀ bit for bit: the green and orange lines differ only in the mask, the orange and violet only in warmup.")
 
     # 11. Follow-ups
@@ -339,8 +339,8 @@ def build() -> None:
     d.text(s, 0.6, 0.85, 12.13, 0.9, "High learning rates break the mask, not the training", size=30, bold=True, font=SERIF, color=WHITE)
     verdicts = [("H1 · Replicate", "SUPPORTED", "2 seeds: +2 to +6.4 pp at η 0.01 / warmup; ≤ +0.5 pp at η 0.1"),
                 ("H2 · Stability ratio", "NOT SUPPORTED", "max S 0.54 ≪ 1; the early spike is not causal (H4)"),
-                ("H3 · Warmup mechanism", "PARTLY", "Coincidence holds; a good mask needs no warmup to train"),
-                ("H4 · Causal test", "MASK, NOT DYNAMICS", "Good masks win at η 0.1; SAM no effect; anchor hurts")]
+                ("H3 · Warmup mechanism", "PARTLY", "Coincidence holds, but warmup is not needed to train a good mask and cannot fix a bad one"),
+                ("H4 · Causal test", "MASK, NOT DYNAMICS", "Good masks win at η 0.1 (2 seeds); bad masks fail even with warmup")]
     for i, (h, tag, b) in enumerate(verdicts):
         x, y = 0.6 + (i % 2) * 6.22, 2.0 + (i // 2) * 2.05
         d.box(s, x, y, 5.92, 1.8, NAVY2)
@@ -353,7 +353,7 @@ def build() -> None:
     s = d.slide(dark=False)
     d.header(s, "LIMITATIONS & NEXT STEPS", "What this study cannot say yet")
     d.card(s, 0.6, 1.75, 5.92, 4.1, "Limitations", body_size=16, title_size=18, body=[
-        "Seeds: 2 for the main conditions, 1 for high_warm, SAM and the anchor.",
+        "Seeds: 2 for the main conditions and H4(a); 1 for high_warm, SAM, the anchor and the reverse swap.",
         "Good masks at η = 0.1 still sit 0.6–2.6 pp below dense: some LR cost survives.",
         "Shortened protocol: 15k steps, 30% per round, no rewinding, one model and dataset.",
         "Sharpness at 15 points per run; the minibatch stability threshold was not measured.",
