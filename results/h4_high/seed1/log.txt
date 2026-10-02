@@ -12,3 +12,6 @@ WARNING: 25.23 h used, past 80% of the 30 h budget
    acc=0.8519 f1=0.8510 R02=0.221 maxS3k=0.664 diverged=False wall=18.0min sharp_overhead=91.8% peakVRAM=2459MB
 WARNING: 25.53 h used, past 80% of the 30 h budget
 [h4_high seed1 r8 ticket] mode=plain remaining=0.0597
+   acc=0.8712 f1=0.8708 R02=0.191 maxS3k=0.254 diverged=False wall=18.1min sharp_overhead=93.6% peakVRAM=2459MB
+WARNING: 25.83 h used, past 80% of the 30 h budget
+[h4_high seed1 r8 shuffle] mode=plain remaining=0.0597
