@@ -117,3 +117,4 @@ time,condition,seed,round,variant,model,mode,gpu,iters,wall_s,sharpness_s,it_per
 2026-10-02T12:35:38,h4_high_anchor,0,6,ticket,resnet20,anchor,Tesla T4,15000,1552.6,549.2,14.9,2460,False
 2026-10-02T12:53:14,warm03,1,5,ticket,resnet20,warmup,Tesla T4,15000,1377.9,593.8,19.1,2459,False
 2026-10-02T13:00:34,h4_high_anchor,0,6,shuffle,resnet20,anchor,Tesla T4,15000,1494.8,585.4,16.5,2460,False
+2026-10-02T13:11:47,h4_high_sam,0,6,ticket,resnet20,sam,Tesla T4,15000,2681.1,618.9,7.3,2459,False
