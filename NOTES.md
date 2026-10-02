@@ -576,5 +576,5 @@ Reminders:
     - **Anchor complete: advantage +7.63 / +10.83 / +12.32 pp (34.5 / 12.0 / 6.0%) → 3/3 masks ≥ +2.0** (r8: ticket 84.44%, shuffle 72.12%). Achieved R_0.2 at 3k: 0.752 / 0.630 / 0.539 (only r3 reaches the 0.661 target; lam was chosen at r3). The D13 manipulation check compares with (a), which is still pending.
     - **SAM r6: ticket 88.86% vs shuffle 85.64% → +3.22 pp** → 1 of 2 masks so far (r3 +1.15). max S(25–3k) 0.214.
     - warm03 s1 r6: ticket 88.67% vs reinit 83.90% → +4.77 pp (seed 0 +4.89); two-seed mean +4.83 pp.
-    - **New ** → `results/h4_results.md` (H4 tables + D13 verdicts with manipulation checks vs (a)); `analysis.plots` calls it, so the autosave keeps it current.
+    - **New `analysis/h4_tables.py`** → `results/h4_results.md` (H4 tables + D13 verdicts with manipulation checks vs (a)); `analysis.plots` calls it, so the autosave keeps it current.
     - Forecast: warm03 4 left ≈ 15:25, SAM 2 left ≈ 15:25, h4_high 6 (alone at the end, faster) ≈ 16:00 → **all done ≈ 16:00 UTC**, ≈ 24.6 h used.
