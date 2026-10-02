@@ -8,6 +8,11 @@ measured and what is still open. **Update it at the end of every work session.**
 
 ## 1. Current status (2026-09-29, session 4, Colab T4)
 
+- **SESSION 7 (2026-10-02): ALL RUNS COMPLETE (15:39 UTC), 24.3 h of 30 h used.** Phase A 60/60, seed 1 45/45, H4 18/18 (+ lam selection).
+  Write-ups done: `results/FINDINGS.md` (H1–H4 verdicts, spec §13), `results/H4.md` §6–7, `results/H2_H3.md`, `results/PHASE_A.md`, Methodology §8 status.
+  **Main result (H4): warm03's masks still win at eta = 0.1 without warmup (+3.59 / +4.80 pp at 12.0 / 6.0%)** → high's failure lies in the masks IMP
+  finds at eta = 0.1, not in sharpness or the loss of weight correlation. SAM lowers S and changes nothing; the anchor hurts the shuffle more than the ticket.
+  Left: nothing required by the spec's definition of done, except (if wanted) the final report/slides built from FINDINGS.md.
 - **SESSION 6 (2026-10-01, from 03:32 UTC): recovered from the VM loss (≈ 10:00 UTC 09-30) and relaunched everything; H4 is queued.**
   Status at 03:32: Phase A 55/60 (high_warm: r6 reinit, r7 ticket, r8 ticket/reinit/shuffle left), seed 1 12/45 (low 6, high 6, warm03 0), H4 0/18.
   Running under MPS: high_warm s0, low s1, high s1; `resume_phaseB.sh warm03` waits for high_warm. **H4 queue (`colab/queue_h4.sh`)**: slot A waits
@@ -583,3 +588,9 @@ Reminders:
     - SAM r8 ticket 87.50%, max S 0.190 (shuffle pending; it decides SAM's verdict: 1/2 so far).
     - warm03 s1: r7 ticket 88.20%; r8 ticket 87.01% vs reinit 81.58% (+5.43 pp; shuffle pending).
     - Forecast: warm03 and SAM end ≈ 15:25; h4_high 4 left, faster once alone → **all done ≈ 15:45–16:00 UTC**, ≈ 24.3 h used.
+  - **15:39 UTC: all runs done** (h4_high last). Cron hourly check deleted. `analysis.plots` re-run (Gate A two seeds: PASSED).
+    H4 (D13): (a) +0.89 / +3.59 / +4.80 → masks still win; (b) SAM +1.15 / +3.22 / +5.26, S lowered 3/3; (c) anchor +7.63 / +10.83 / +12.32, R_0.2 raised 3/3,
+    but its tickets are −2.7 to −3.6 pp vs (a) and its shuffles −10 pp. `analysis/h4_tables.py` now notes when (a) already meets the rule.
+    warm03 s1 final: +2.03 / +3.56 / +4.77 / +5.43 pp; r8 ticket 0.80 pp below dense (s1 strict 3/4, means 4/4).
+  - **16:00 UTC:** `results/FINDINGS.md` written; H4.md §6–7, H2_H3.md, PHASE_A.md and the Methodology §8 status updated. Seed-to-seed spread
+    of advantages corrected to ≤ 0.6 pp (2.0 pp for warm03 at 6.0%); the earlier ≈ 0.05–0.4 pp came from rounds 2–6 only.
