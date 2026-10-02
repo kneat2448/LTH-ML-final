@@ -8,3 +8,5 @@ COST ESTIMATE h4_high_anchor: 5 trainings x 8.0 min = 0.67 h runtime on Tesla T4
 [h4_high_anchor seed0 r6 ticket] mode=anchor remaining=0.1197
    acc=0.8619 f1=0.8616 R02=0.762 maxS3k=0.344 diverged=False wall=25.9min sharp_overhead=54.7% peakVRAM=2460MB
 [h4_high_anchor seed0 r6 shuffle] mode=anchor remaining=0.1197
+   acc=0.7536 f1=0.7519 R02=0.807 maxS3k=0.370 diverged=False wall=24.9min sharp_overhead=64.4% peakVRAM=2460MB
+[h4_high_anchor seed0 r8 ticket] mode=anchor remaining=0.0597
