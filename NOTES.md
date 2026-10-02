@@ -592,5 +592,5 @@ Reminders:
     H4 (D13): (a) +0.89 / +3.59 / +4.80 → masks still win; (b) SAM +1.15 / +3.22 / +5.26, S lowered 3/3; (c) anchor +7.63 / +10.83 / +12.32, R_0.2 raised 3/3,
     but its tickets are −2.7 to −3.6 pp vs (a) and its shuffles −10 pp. `analysis/h4_tables.py` now notes when (a) already meets the rule.
     warm03 s1 final: +2.03 / +3.56 / +4.77 / +5.43 pp; r8 ticket 0.80 pp below dense (s1 strict 3/4, means 4/4).
-  - **16:00 UTC:** `results/FINDINGS.md` written; H4.md §6–7, H2_H3.md, PHASE_A.md and the Methodology §8 status updated. Seed-to-seed spread
+  - **15:47 UTC:** `results/FINDINGS.md` written; H4.md §6–7, H2_H3.md, PHASE_A.md and the Methodology §8 status updated. Seed-to-seed spread
     of advantages corrected to ≤ 0.6 pp (2.0 pp for warm03 at 6.0%); the earlier ≈ 0.05–0.4 pp came from rounds 2–6 only.

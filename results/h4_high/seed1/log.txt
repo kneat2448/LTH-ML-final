@@ -1,0 +1,2 @@
+COST ESTIMATE h4_high: 6 trainings x 9.4 min = 0.94 h runtime on Tesla T4; used so far 24.31 / 30 h
+[h4_high seed1 r3 ticket] mode=plain remaining=0.3447
